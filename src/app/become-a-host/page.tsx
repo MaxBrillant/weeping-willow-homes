@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BackButton from "../components/backButton";
 import HomeInformationForm from "../homeForm/homeInformationForm";
 import AccommodationForm from "../homeForm/accommodationForm";
@@ -21,14 +21,16 @@ export default function BecomeAHost() {
     const {
       data: { session },
     } = await supabase.auth.getSession();
-    console.log(session);
 
     if (!session) {
       push("/login");
     }
   };
 
-  handleSignedOutUser();
+  useEffect(() => {
+    handleSignedOutUser();
+  }, []);
+
   //   const step1 = document.querySelector("#step-1");
   //   const step2 = document.querySelector("#step-2");
   //   const scrollToStep1 = () => step1?.scrollIntoView({ behavior: "smooth" });

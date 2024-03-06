@@ -1,18 +1,25 @@
-"use server";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+"use client";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import SignInButton from "../components/signInButton";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export default async function Login() {
-  const supabase = createServerComponentClient({ cookies });
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+export default function Login() {
+  const { push } = useRouter();
+  const handleSignedOutUser = async () => {
+    const supabase = createClientComponentClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-  if (session) {
-    redirect("/");
-  }
+    if (session) {
+      push("/");
+    }
+  };
+
+  useEffect(() => {
+    handleSignedOutUser();
+  }, []);
 
   return (
     <div className="flex flex-col p-5 w-fit h-fit gap-3 items-center mx-auto">
