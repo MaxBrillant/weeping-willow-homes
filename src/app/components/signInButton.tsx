@@ -13,12 +13,13 @@ export default function SignInButton() {
       provider: "google",
       options: {
         queryParams: {
-          // access_type: "offline",
+          access_type: "offline",
           prompt: "consent",
         },
-        redirectTo: window.location.origin + "/auth/callback",
+        redirectTo: `${location.origin}/auth/callback`,
       },
     });
+    router.refresh();
   };
   return <Button onClick={() => handleSignIn()}>Sign in with Google</Button>;
 }
