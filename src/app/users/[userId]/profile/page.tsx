@@ -40,7 +40,7 @@ export default async function Profile({
       <>
         <BackButton />
         <div className="flex flex-col gap-5 p-3 items-center">
-          <p>This user doesn't exist.</p>
+          <p>{`This user doesn't exist.`}</p>
           <Link href={"/"}>
             <Button>Search for homes</Button>
           </Link>
@@ -71,7 +71,7 @@ export default async function Profile({
           <p>{formatLanguages(userProfile.languages)}</p>
           {userProfile.isIdentityVerified && (
             <p className="font-semibold">
-              This user's identity has been verified
+              {`This user's identity has been verified`}
             </p>
           )}
           {activeUserId && activeUserId === userProfile.userId && (

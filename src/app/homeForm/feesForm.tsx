@@ -154,10 +154,10 @@ export default function FeesForm(form: formProps) {
       <div className="flex flex-col">
         <p className="font-semibold text-lg">Booking option</p>
         <p>
-          Define how guests can book your property. This includes options such
+          {`Define how guests can book your property. This includes options such
           as "Instant Book," which allows guests to reserve the property without
           host approval, or "Approve or Decline Booking Requests," which means
-          you'll review and approve each reservation individually.
+          you'll review and approve each reservation individually.`}
         </p>
         <OptionContainer
           options={["Instant Book", "Accept or Decline Booking Requests"]}

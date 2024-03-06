@@ -132,7 +132,7 @@ export default async function HomeDetails({
               <p>{formatLanguages(homeDetails.userProfile.languages)}</p>
               {homeDetails.userProfile.isIdentityVerified && (
                 <p className="font-semibold">
-                  This user's identity has been verified
+                  {`This user's identity has been verified`}
                 </p>
               )}
               <Link href={"/users/" + homeDetails.userProfile.id + "/profile"}>

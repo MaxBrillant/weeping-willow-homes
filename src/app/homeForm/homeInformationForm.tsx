@@ -66,8 +66,8 @@ export default function HomeInformationForm(form: formProps) {
       <div className="flex flex-col">
         <p className="font-semibold text-lg">Type of property</p>
         <p>
-          Choose the option that best describes your property, whether it's a
-          standalone house or an apartment within a building.
+          {`Choose the option that best describes your property, whether it's a
+          standalone house or an apartment within a building.`}
         </p>
         <OptionContainer
           options={["House", "Apartment"]}

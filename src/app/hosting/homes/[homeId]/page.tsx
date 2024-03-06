@@ -28,7 +28,7 @@ export default async function Home({ params }: { params: { homeId: number } }) {
   if (hostHomeDetails == undefined) {
     return (
       <div className="flex flex-col gap-5 p-3 items-center">
-        <p>You don't have access to this home.</p>
+        <p>{`You don't have access to this home.`}</p>
         <Link href={"/become-a-host"}>
           <Button>Start hosting and earning</Button>
         </Link>

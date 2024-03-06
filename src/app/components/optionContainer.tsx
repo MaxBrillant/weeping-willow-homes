@@ -15,6 +15,7 @@ export default function OptionContainer(container: containerProps) {
       {container.options.map((option, index) =>
         selectedOptions.includes(index) ? (
           <button
+            key={index}
             onClick={(e) => {
               e.preventDefault();
               setSelectedOptions((currentlySelectedOptions) =>
@@ -34,6 +35,7 @@ export default function OptionContainer(container: containerProps) {
           </button>
         ) : (
           <button
+            key={index}
             onClick={(e) => {
               e.preventDefault(); //don't touch, it's very useful in forms
               if (!container.multipleSelectionEnabled) {

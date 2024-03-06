@@ -9,10 +9,26 @@ import PhotosForm from "../homeForm/photosForm";
 import FacilitiesAndFeaturesForm from "../homeForm/facilitiesAndFeaturesForm";
 import FeesForm from "../homeForm/feesForm";
 import HouseRulesAndInformation from "../homeForm/houseRulesAndInformationForm";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
 
 export default function BecomeAHost() {
   const [step, setStep] = useState<number>(6);
 
+  const handleSignedOutUser = async () => {
+    const { push } = useRouter();
+    const supabase = createClientComponentClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    console.log(session);
+
+    if (!session) {
+      push("/login");
+    }
+  };
+
+  handleSignedOutUser();
   //   const step1 = document.querySelector("#step-1");
   //   const step2 = document.querySelector("#step-2");
   //   const scrollToStep1 = () => step1?.scrollIntoView({ behavior: "smooth" });
