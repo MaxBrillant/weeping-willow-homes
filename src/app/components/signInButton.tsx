@@ -13,7 +13,7 @@ export default function SignInButton() {
       provider: "google",
       options: {
         queryParams: {
-          access_type: "offline",
+          // access_type: "offline",
           prompt: "consent",
         },
         redirectTo: `${location.origin}/auth/callback`,
