@@ -16,10 +16,9 @@ export default function SignInButton() {
           // access_type: "offline",
           prompt: "consent",
         },
-        redirectTo: `${location.origin}/auth/callback`,
+        redirectTo: window.location.origin + "/auth/callback",
       },
     });
-    router.refresh();
   };
   return <Button onClick={() => handleSignIn()}>Sign in with Google</Button>;
 }
