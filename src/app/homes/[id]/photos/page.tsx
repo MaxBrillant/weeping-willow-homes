@@ -20,7 +20,7 @@ export default async function PhotoGallery({
           <p className="font-bold text-3xl">Photo gallery</p>
         </div>
         <p className="text-2xl font-medium">
-          This home's photos are currently unavailable.
+          {`This home's photos are currently unavailable.`}
         </p>
       </div>
     );

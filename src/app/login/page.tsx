@@ -17,7 +17,7 @@ export default async function Login() {
   return (
     <div className="flex flex-col p-5 w-fit h-fit gap-3 items-center mx-auto">
       <p className="text-3xl font-bold">Welcome</p>
-      <p>Let's reach new heights together.</p>
+      <p>{`Let's reach new heights together.`}</p>
       <SignInButton />
     </div>
   );

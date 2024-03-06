@@ -22,7 +22,7 @@ export default async function ManageGuests() {
   if (hostGuests.length === 0) {
     return (
       <div className="flex flex-col gap-5 p-3 items-center">
-        <p>You don't have any guests...yet.</p>
+        <p>{`You don't have any guests...yet.`}</p>
       </div>
     );
   }

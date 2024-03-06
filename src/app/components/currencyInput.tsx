@@ -1,4 +1,3 @@
-import { Input } from "@/components/ui/input";
 import React, { ForwardedRef, useCallback, useEffect, useRef } from "react";
 
 export interface InputProps
@@ -64,4 +63,6 @@ const CurrencyInput = React.forwardRef<HTMLInputElement, InputProps>(
     );
   }
 );
+
+CurrencyInput.displayName = "CurrencyInput";
 export { CurrencyInput };

@@ -56,6 +56,7 @@ export default function SearchSelection(search: searchSelectionProps) {
             {cities.map((city, index) =>
               selectedCity === index ? (
                 <button
+                  key={index}
                   className="flex flex-col items-center rounded-2xl bg-gray-300 border-4 border-gray-700 overflow-hidden"
                   onClick={() => {
                     setSelectedCity(undefined);
@@ -73,6 +74,7 @@ export default function SearchSelection(search: searchSelectionProps) {
                 </button>
               ) : (
                 <button
+                  key={index}
                   className="flex flex-col items-center rounded-2xl border border-gray-500 overflow-hidden "
                   onClick={() => {
                     setSelectedCity(index);

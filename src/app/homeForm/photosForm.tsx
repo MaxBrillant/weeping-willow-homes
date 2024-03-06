@@ -134,15 +134,15 @@ export default function PhotosForm(form: formProps) {
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col gap-10 p-5"
     >
-      {photoCategories.map((category) => {
+      {photoCategories.map((category, index) => {
         return (
-          <div className="flex flex-col">
+          <div key={index} className="flex flex-col">
             <p className="font-semibold text-lg">{category.title}</p>
             <p>{category.description}</p>
             <div className="flex flex-wrap gap-2">
               {watch(category.validationString)?.map((photo, index) => {
                 return (
-                  <div id={String(index)} className="relative">
+                  <div key={index} id={String(index)} className="relative">
                     <Image
                       src={photo}
                       height={100}

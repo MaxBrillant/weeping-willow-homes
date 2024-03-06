@@ -31,7 +31,7 @@ export default async function GuestPage({
   if (guestDetails == undefined) {
     return (
       <div className="flex flex-col gap-5 p-3 items-center">
-        <p>You don't have access to information about this guest.</p>
+        <p>{`You don't have access to information about this guest.`}</p>
         <Link href={"/hosting"}>
           <Button>Go to the hosting page</Button>
         </Link>

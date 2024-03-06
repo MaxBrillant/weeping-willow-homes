@@ -32,7 +32,7 @@ export default async function StayDetails({
   if (stayDetails == undefined) {
     return (
       <div className="flex flex-col gap-5 p-3 items-center">
-        <p>You don't have access to this stay.</p>
+        <p>{`You don't have access to this stay.`}</p>
         <Link href={"/"}>
           <Button>Search for homes</Button>
         </Link>
