@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
-  console.log("Initial url: " + requestUrl);
+  console.warn("Initial url: " + requestUrl);
   const code = requestUrl.searchParams.get("code");
 
   if (code) {
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     await supabase.auth.exchangeCodeForSession(code);
   }
 
-  console.log("End url: " + requestUrl);
+  console.warn("End url: " + requestUrl);
 
   // URL to redirect to after sign in process completes
   return NextResponse.redirect(requestUrl.origin);
