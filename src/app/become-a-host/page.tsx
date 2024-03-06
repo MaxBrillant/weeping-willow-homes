@@ -14,9 +14,9 @@ import { useRouter } from "next/navigation";
 
 export default function BecomeAHost() {
   const [step, setStep] = useState<number>(6);
+  const { push } = useRouter();
 
   const handleSignedOutUser = async () => {
-    const { push } = useRouter();
     const supabase = createClientComponentClient();
     const {
       data: { session },
