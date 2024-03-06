@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 
 export default function SignInButton() {
   const router = useRouter();
-  const originUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
   const handleSignIn = async () => {
     const supabase = createClientComponentClient();
@@ -17,7 +16,7 @@ export default function SignInButton() {
           access_type: "offline",
           prompt: "consent",
         },
-        redirectTo: originUrl + "/auth/callback",
+        redirectTo: `${location.origin}/auth/callback`,
       },
     });
     router.refresh();
