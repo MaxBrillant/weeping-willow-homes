@@ -19,7 +19,7 @@ export default function SignInButton() {
         redirectTo: `${location.origin}/auth/callback`,
       },
     });
-    router.refresh();
+    // router.refresh();
   };
   return <Button onClick={() => handleSignIn()}>Sign in with Google</Button>;
 }
