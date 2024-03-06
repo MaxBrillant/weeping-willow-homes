@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 export default function SignInButton() {
   const router = useRouter();
-  const originUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const originUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
   const handleSignIn = async () => {
     const supabase = createClientComponentClient();
