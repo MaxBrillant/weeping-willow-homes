@@ -14,7 +14,7 @@ export default function Login({ searchParams }: { searchParams: any }) {
   const redirectUrl = params.get("redirect-to");
 
   let url = "";
-
+  console.log(redirectUrl);
   if (redirectUrl) {
     url = `${location.origin}/auth/callback?redi=${redirectUrl}`;
   } else {

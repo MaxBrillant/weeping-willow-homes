@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 export default function SignInButton({ url }: { url: string }) {
-  console.log(url);
   const handleSignIn = async () => {
     const supabase = createClientComponentClient();
     await supabase.auth.signInWithOAuth({
@@ -12,7 +11,7 @@ export default function SignInButton({ url }: { url: string }) {
       options: {
         queryParams: {
           access_type: "offline",
-          prompt: "consent",
+          // prompt: "consent",
         },
         redirectTo: url,
       },
