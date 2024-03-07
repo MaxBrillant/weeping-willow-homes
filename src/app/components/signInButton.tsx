@@ -16,7 +16,6 @@ export default function SignInButton({ url }: { url: string }) {
         redirectTo: url,
       },
     });
-    // router.refresh();
   };
   return <Button onClick={() => handleSignIn()}>Sign in with Google</Button>;
 }
