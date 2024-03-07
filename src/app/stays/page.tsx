@@ -1,6 +1,6 @@
 import getListOfStays from "@/api/fetch/fetchStays";
 import Stay from "../components/stay";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -14,7 +14,8 @@ export default async function Stays() {
   } = await supabase.auth.getSession();
 
   if (!session) {
-    redirect("/login");
+    const headersList = headers();
+    redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
   }
 
   const stays = await getListOfStays(supabase);

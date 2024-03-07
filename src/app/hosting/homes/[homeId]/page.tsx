@@ -3,7 +3,7 @@ import Link from "next/link";
 import Map, { ExpandMap } from "@/app/components/map";
 import BackButton from "@/app/components/backButton";
 import getHostHomeDetails from "@/api/fetch/fetchHostHomeDetails";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { redirect } from "next/navigation";
 import Image from "next/image";
@@ -18,7 +18,8 @@ export default async function Home({ params }: { params: { homeId: number } }) {
   } = await supabase.auth.getSession();
 
   if (!session) {
-    redirect("/login");
+    const headersList = headers();
+    redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
   }
 
   const hostHomeDetails = await getHostHomeDetails(supabase, homeId);

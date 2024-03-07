@@ -23,7 +23,7 @@ export default function BecomeAHost() {
     } = await supabase.auth.getSession();
 
     if (!session) {
-      push("/login");
+      push(`/login?redirect-to=${location}`);
     }
   };
 

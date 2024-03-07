@@ -1,8 +1,7 @@
 import Image from "next/image";
 import Icon from "../../icons/search.svg";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { redirect } from "next/navigation";
 import { getUserBasicInfo } from "@/api/fetch/fetchUserProfile";
@@ -16,7 +15,8 @@ export default async function Account() {
   } = await supabase.auth.getSession();
 
   if (!session) {
-    redirect("/login");
+    const headersList = headers();
+    redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
   }
   if (session.user.id != undefined) {
     const basicInfo = await getUserBasicInfo(supabase, session.user.id);

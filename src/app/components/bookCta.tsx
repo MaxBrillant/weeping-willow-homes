@@ -140,7 +140,7 @@ function BookingPage(stay: {
     console.log(session);
 
     if (!session) {
-      push("/login");
+      push(`/login?redirect-to=${location}`);
     }
   };
 

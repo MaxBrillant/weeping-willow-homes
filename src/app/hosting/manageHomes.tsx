@@ -1,7 +1,7 @@
 import getAllHostHomes from "@/api/fetch/fetchHostHomes";
 import { Button } from "@/components/ui/button";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -14,7 +14,8 @@ export default async function ManageHomes() {
   } = await supabase.auth.getSession();
 
   if (!session) {
-    redirect("/login");
+    const headersList = headers();
+    redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
   }
 
   const hostHomes = await getAllHostHomes(supabase);

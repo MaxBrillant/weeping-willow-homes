@@ -4,8 +4,24 @@ import SignInButton from "../components/signInButton";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-export default function Login() {
+export default function Login({ searchParams }: { searchParams: any }) {
   const { push } = useRouter();
+
+  const params =
+    searchParams instanceof URLSearchParams
+      ? searchParams
+      : new URLSearchParams(searchParams);
+  const redirectUrl = params.get("redirect-to");
+
+  let url = "";
+
+  if (redirectUrl) {
+    url = `${location.origin}/auth/callback?redi=${redirectUrl}`;
+  } else {
+    url = `${location.origin}/auth/callback`;
+  }
+  console.log(url);
+
   const handleSignedOutUser = async () => {
     const supabase = createClientComponentClient();
     const {
@@ -25,7 +41,7 @@ export default function Login() {
     <div className="flex flex-col p-5 w-fit h-fit gap-3 items-center mx-auto">
       <p className="text-3xl font-bold">Welcome</p>
       <p>{`Let's reach new heights together.`}</p>
-      <SignInButton />
+      <SignInButton url={url} />
     </div>
   );
 }
