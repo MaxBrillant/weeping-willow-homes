@@ -11,7 +11,7 @@ export default function SignInButton({ url }: { url: string }) {
       options: {
         queryParams: {
           access_type: "offline",
-          prompt: "consent",
+          // prompt: "consent",
         },
         redirectTo: url,
       },

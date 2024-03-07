@@ -131,6 +131,7 @@ function BookingPage(stay: {
 }) {
   const [open, setOpen] = useState(false);
   const { push } = useRouter();
+  const searchParams = useSearchParams();
 
   const handleSignedOutUser = async () => {
     const supabase = createClientComponentClient();
@@ -140,7 +141,31 @@ function BookingPage(stay: {
     console.log(session);
 
     if (!session) {
-      push(`/login?redirect-to=${location}`);
+      const params = new URLSearchParams(searchParams);
+      params.delete("guests");
+      params.delete("start-date");
+      params.delete("duration");
+
+      if (stay.numberOfGuests != undefined) {
+        params.set("guests", stay.numberOfGuests.toString());
+      }
+      if (stay.date != undefined) {
+        let dateString =
+          stay.date.getFullYear() +
+          "-" +
+          (stay.date.getMonth() + 1) +
+          "-" +
+          stay.date.getDate();
+        params.set("start-date", dateString);
+      }
+      if (stay.duration != undefined) {
+        params.set("duration", stay.duration.toString());
+      }
+      push(
+        `/login?redirect-to=${location.protocol}//${location.host}${
+          location.pathname
+        }?${params.toString().replaceAll("&", "!")}`
+      );
     }
   };
 
