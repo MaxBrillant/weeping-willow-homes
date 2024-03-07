@@ -9,7 +9,7 @@ export default function SignOutButton() {
   const handleSignOut = async () => {
     const supabase = createClientComponentClient();
     await supabase.auth.signOut();
-    router.refresh();
+    router.push("/");
   };
   return (
     <Button
