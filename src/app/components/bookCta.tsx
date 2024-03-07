@@ -27,7 +27,7 @@ type ctaProps = {
 };
 export default function BookCta(cta: ctaProps) {
   const searchParams = useSearchParams();
-  const { replace, push } = useRouter();
+  const { replace } = useRouter();
 
   useEffect(() => {
     try {
