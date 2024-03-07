@@ -13,7 +13,10 @@ import {
 } from "@/components/ui/dialog";
 import Image from "next/image";
 import PaymentForm from "./paymentForm";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import {
+  Session,
+  createClientComponentClient,
+} from "@supabase/auth-helpers-nextjs";
 
 type ctaProps = {
   title: string;
@@ -133,13 +136,19 @@ function BookingPage(stay: {
   const { push } = useRouter();
   const searchParams = useSearchParams();
 
-  const handleSignedOutUser = async () => {
+  const getAuthSession = async () => {
     const supabase = createClientComponentClient();
     const {
       data: { session },
     } = await supabase.auth.getSession();
-    console.log(session);
+    return session;
+  };
 
+  let session: Session | null;
+  getAuthSession().then((value) => {
+    return (session = value);
+  });
+  const handleSignedOutUser = async () => {
     if (!session) {
       const params = new URLSearchParams(searchParams);
       params.delete("guests");
