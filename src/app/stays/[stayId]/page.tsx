@@ -3,7 +3,7 @@ import BackButton from "@/app/components/backButton";
 import Map, { ExpandMap } from "@/app/components/map";
 import { Button } from "@/components/ui/button";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -22,7 +22,8 @@ export default async function StayDetails({
   } = await supabase.auth.getSession();
 
   if (!session) {
-    redirect("/login");
+    const headersList = headers();
+    redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
   }
 
   const stayDetails = await getStayDetails(supabase, stayId);
@@ -69,10 +70,6 @@ export default async function StayDetails({
               <p className="font-semibold">Status: {stayDetails.status}</p>
             </div>
             <div className="flex flex-row flex-wrap gap-3">
-              {(stayDetails.status === "booked" ||
-                stayDetails.status === "awaiting-approval") && (
-                <Button variant={"outline"}>Edit stay</Button>
-              )}
               {(stayDetails.status === "checked-in" ||
                 stayDetails.status === "booked" ||
                 stayDetails.status === "awaiting-approval") && (

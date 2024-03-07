@@ -2,11 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/navigation";
 
-export default function SignInButton() {
-  const router = useRouter();
-
+export default function SignInButton({ url }: { url: string }) {
+  console.log(url);
   const handleSignIn = async () => {
     const supabase = createClientComponentClient();
     await supabase.auth.signInWithOAuth({
@@ -16,7 +14,7 @@ export default function SignInButton() {
           access_type: "offline",
           prompt: "consent",
         },
-        redirectTo: `${location.origin}/auth/callback`,
+        redirectTo: url,
       },
     });
     // router.refresh();

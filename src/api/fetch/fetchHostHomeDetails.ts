@@ -108,7 +108,6 @@ export default async function getHostHomeDetails(
         "accommodation_information(guests, bedrooms, beds, private_bathrooms, shared_bathrooms), " +
         "home_photos(id, cover_photo, sleeping_space, living_space, kitchen, bathrooms, building), " +
         "home_facilities_and_features(id, facilities_and_features(title, icon_url)), " +
-        "stays!left(check_out_date, status), " +
         "home_location(city, longitude, latitude), " +
         "home_fees(currency, monthly_fee, first_time_fee, first_time_fee_description, booking_option), " +
         "user_profile!inner(user_id), " +
