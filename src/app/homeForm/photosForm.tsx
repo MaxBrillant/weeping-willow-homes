@@ -1,4 +1,14 @@
+"use client";
+import getPhotosDefaultValues from "@/api/defaultValues/photosForm";
+import { addOrUpdatePhotos } from "@/api/mutations/photosMutations";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { PhotosFormSchema } from "@/validation/newHomeValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,8 +22,16 @@ type schema = z.infer<typeof PhotosFormSchema>;
 type formProps = {
   backFunctions: (() => void | undefined)[];
   submitFunctions: (() => void | undefined)[];
+  homeId: number | null;
+};
+
+type defaultValuesType = {
+  photosId: number;
 };
 export default function PhotosForm(form: formProps) {
+  const [defaultValues, setDefaultValues] = useState<
+    defaultValuesType | undefined
+  >();
   const {
     handleSubmit,
     watch,
@@ -24,7 +42,38 @@ export default function PhotosForm(form: formProps) {
     mode: "onChange",
   });
 
-  // const[sleepingSpacePhotos, setSleepingSpacePhotos] = useState<string[]>([])
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setValue("additionalPhotos", []);
+    const getDefaultValues = async () => {
+      if (form.homeId) {
+        setIsLoading(true);
+        const values = await getPhotosDefaultValues(form.homeId);
+        if (values) {
+          setDefaultValues({
+            photosId: values.photosId,
+          });
+          setValue("coverPhoto", values.coverPhotoUrl);
+          setValue("sleepingSpacePhotos", values.sleepingSpace);
+          setValue("livingSpacePhotos", values.livingSpace);
+          setValue("bathroomPhotos", values.bathrooms);
+          setValue("kitchenPhotos", values.kitchen);
+          setValue("buildingPhotos", values.building);
+          setValue("outdoorsPhotos", values.outdoors);
+          setValue("additionalPhotos", values.additional);
+        } else {
+          setDefaultValues(undefined);
+        }
+        setIsLoading(false);
+      } else {
+        setDefaultValues(undefined);
+        setIsLoading(false);
+      }
+    };
+    getDefaultValues();
+  }, [form.homeId]);
 
   const sleepingSpaceInputRef = useRef<HTMLInputElement>(null);
   const livingSpaceInputRef = useRef<HTMLInputElement>(null);
@@ -33,6 +82,15 @@ export default function PhotosForm(form: formProps) {
   const buildingInputRef = useRef<HTMLInputElement>(null);
   const outddorsInputRef = useRef<HTMLInputElement>(null);
   const additionalInputRef = useRef<HTMLInputElement>(null);
+  type newPhotosType = {
+    files: File[];
+    paths: string[];
+  };
+  const [newPhotos, setNewPhotos] = useState<newPhotosType>({
+    files: [],
+    paths: [],
+  });
+  const [photosToDelete, setPhotosToDelete] = useState<string[]>([]);
 
   type tCategory = {
     title: string;
@@ -114,20 +172,62 @@ export default function PhotosForm(form: formProps) {
     },
   ];
 
-  useEffect(() => {
-    photoCategories.map((category) => {
-      setValue(category.validationString, []);
-    });
-  }),
-    [photoCategories];
+  const onSubmit = async (data: schema) => {
+    setIsSubmitting(true);
+    const { files, paths } = newPhotos;
 
-  const onSubmit = (data: schema) => {
-    //MAKE SURE THE COVER pPHOTO IS THERE. ADD ITS FUNCTIONALITY
-    console.log(data);
+    console.log(photosToDelete);
+    const formData = new FormData();
+    const appendAllFiles = await Promise.all(
+      files.map(async (file) => {
+        formData.append("files", file);
+      })
+    );
+
+    if (defaultValues == undefined) {
+      await addOrUpdatePhotos({
+        photosId: null,
+        homeId: form.homeId as number,
+        coverPhoto: data.coverPhoto,
+        sleepingSpace: data.sleepingSpacePhotos,
+        livingSpace: data.livingSpacePhotos,
+        bathrooms: data.bathroomPhotos,
+        kitchen: data.kitchenPhotos,
+        building: data.buildingPhotos,
+        outdoors: data.outdoorsPhotos,
+        additional:
+          data.additionalPhotos != undefined ? data.additionalPhotos : [],
+        newPhotosFiles: formData,
+        newPhotosPaths: paths,
+        photosToDelete: photosToDelete,
+      });
+    } else {
+      await addOrUpdatePhotos({
+        photosId: defaultValues.photosId,
+        homeId: form.homeId as number,
+        coverPhoto: data.coverPhoto,
+        sleepingSpace: data.sleepingSpacePhotos,
+        livingSpace: data.livingSpacePhotos,
+        bathrooms: data.bathroomPhotos,
+        kitchen: data.kitchenPhotos,
+        building: data.buildingPhotos,
+        outdoors: data.outdoorsPhotos,
+        additional:
+          data.additionalPhotos != undefined ? data.additionalPhotos : [],
+        newPhotosFiles: formData,
+        newPhotosPaths: paths,
+        photosToDelete: photosToDelete,
+      });
+    }
     form.submitFunctions.map((submitFunction: () => void) => {
       submitFunction();
     });
+    setIsSubmitting(false);
   };
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <form
@@ -148,25 +248,98 @@ export default function PhotosForm(form: formProps) {
                       height={100}
                       width={100}
                       alt="photo"
+                      loading="lazy"
                       className="aspect-square object-cover border border-black rounded-xl"
                     />
-                    <Button
-                      variant={"secondary"}
-                      size={"icon"}
-                      className="absolute top-1 right-1 w-6 h-6 opacity-90 rounded-full"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setValue("coverPhoto", "/home1.webp");
-                        setValue(
-                          category.validationString,
-                          watch(category.validationString).filter(
-                            (photos) => photos !== photo
-                          )
-                        );
-                      }}
-                    >
-                      X
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className="absolute top-1 right-1 ">
+                        <Button
+                          variant={"secondary"}
+                          size={"icon"}
+                          className="w-6 h-6 opacity-90 rounded-full"
+                        >
+                          ...
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        {index > 0 && (
+                          <DropdownMenuItem
+                            onClick={() => {
+                              const newItems = [
+                                ...watch(category.validationString),
+                              ];
+                              const item = newItems[index];
+                              newItems[index] = newItems[index - 1];
+                              newItems[index - 1] = item;
+                              setValue(category.validationString, newItems);
+                            }}
+                          >
+                            Move up
+                          </DropdownMenuItem>
+                        )}
+                        {index <
+                          watch(category.validationString)?.length - 1 && (
+                          <DropdownMenuItem
+                            onClick={() => {
+                              const newItems = [
+                                ...watch(category.validationString),
+                              ];
+                              const item = newItems[index];
+                              newItems[index] = newItems[index + 1];
+                              newItems[index + 1] = item;
+                              setValue(category.validationString, newItems);
+                            }}
+                          >
+                            Move down
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
+                        {photo !== watch("coverPhoto") && (
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              setValue("coverPhoto", photo);
+                            }}
+                          >
+                            Make cover photo
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            watch("coverPhoto") === photo &&
+                              setValue("coverPhoto", "");
+                            setValue(
+                              category.validationString,
+                              watch(category.validationString)?.filter(
+                                (photos) => photos !== photo
+                              )
+                            );
+
+                            setNewPhotos((prevState) => ({
+                              ...prevState,
+                              files: prevState.files.filter(
+                                (file, index) =>
+                                  prevState.paths[index] !== photo
+                              ),
+                              paths: prevState.paths.filter(
+                                (path) => path !== photo
+                              ),
+                            }));
+
+                            if (photo.includes("supabase")) {
+                              setPhotosToDelete(photosToDelete.concat(photo));
+                            }
+                          }}
+                        >
+                          Remove photo
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    {photo === watch("coverPhoto") && (
+                      <div className="absolute left-1 bottom-1 px-1 rounded-2xl bg-white opacity-90">
+                        <p>Cover</p>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -174,19 +347,27 @@ export default function PhotosForm(form: formProps) {
                 ref={category.ref}
                 className="hidden"
                 type="file"
-                accept=".jpg,.jpeg,.png"
+                accept=".jpg,.jpeg,.png,.webp"
                 multiple
                 onChange={(e) => {
                   if (e.target.files) {
+                    console.log(watch(category.validationString));
                     const filePaths = Array.from(e.target.files).map((file) =>
                       URL.createObjectURL(file)
                     );
                     watch(category.validationString) != undefined
                       ? setValue(category.validationString, [
-                          ...watch(category.validationString),
+                          ...(watch(category.validationString) as string[]),
                           ...filePaths,
                         ])
                       : setValue(category.validationString, [...filePaths]);
+
+                    const files = Array.from(e.target.files).map(
+                      (file) => file
+                    );
+                    const newFiles = [...newPhotos.files, ...files];
+                    const newPaths = [...newPhotos.paths, ...filePaths];
+                    setNewPhotos({ files: newFiles, paths: newPaths });
                   }
                 }}
               />
@@ -194,7 +375,7 @@ export default function PhotosForm(form: formProps) {
                 variant={"secondary"}
                 className=" border-2 border-black border-dashed font-bold text-3xl w-[100px] h-[100px]"
                 disabled={
-                  watch(category.validationString)?.length > category.max
+                  watch(category.validationString)?.length >= category.max
                 }
                 onClick={(e) => {
                   e.preventDefault();
@@ -254,18 +435,27 @@ export default function PhotosForm(form: formProps) {
           </div>
         );
       })}
+      {errors.coverPhoto && (
+        <p className="text-red-500 font-semibold">
+          {errors.coverPhoto.message}
+        </p>
+      )}
       <div className="w-full flex flex-row gap-3 justify-end p-3">
-        <Button
-          variant={"outline"}
-          onClick={() =>
-            form.backFunctions.map((backFunction: () => void) => {
-              backFunction();
-            })
-          }
-        >
-          Back
+        {form.backFunctions.length > 0 && (
+          <Button
+            variant={"outline"}
+            onClick={() =>
+              form.backFunctions.map((backFunction: () => void) => {
+                backFunction();
+              })
+            }
+          >
+            Back
+          </Button>
+        )}
+        <Button type="submit" disabled={isSubmitting}>
+          Save and continue
         </Button>
-        <Button type="submit">Next</Button>
       </div>
     </form>
   );

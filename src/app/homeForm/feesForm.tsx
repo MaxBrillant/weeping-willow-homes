@@ -2,24 +2,33 @@
 
 import { FeesAndFinancesFormSchema } from "@/validation/newHomeValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Ref, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import OptionContainer from "../components/optionContainer";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { CurrencyInput } from "../components/currencyInput";
+import getFeesDefaultValues from "@/api/defaultValues/feesForm";
+import { addOrUpdateFeesInformation } from "@/api/mutations/feesFormMutations";
 
 type schema = z.infer<typeof FeesAndFinancesFormSchema>;
 
 type formProps = {
   backFunctions: (() => void | undefined)[];
   submitFunctions: (() => void | undefined)[];
+  homeId: number | null;
+};
+
+type defaultValuesType = {
+  feesId: number;
+  firstTimeFeeDescription: string | null;
 };
 export default function FeesForm(form: formProps) {
   const {
     register,
     handleSubmit,
+    watch,
     setValue,
     formState: { errors },
   } = useForm<schema>({
@@ -27,13 +36,58 @@ export default function FeesForm(form: formProps) {
     mode: "onChange",
   });
 
+  const [defaultValues, setDefaultValues] = useState<
+    defaultValuesType | undefined
+  >();
   const [selectedCurrency, setSelectedCurrency] = useState<number[]>([]);
   const [selectedBookingOption, setSelectedBookingOption] = useState<number[]>(
     []
   );
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const regularFeesInputRef = useRef<HTMLInputElement | null>(null);
   const firstTimeFeesInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const getDefaultValues = async () => {
+      if (form.homeId) {
+        setIsLoading(true);
+        const values = await getFeesDefaultValues(form.homeId);
+        if (values) {
+          setDefaultValues({
+            feesId: values.feesId,
+            firstTimeFeeDescription: values.firstTimeFeeDescription,
+          });
+
+          setValue("monthlyFees", values.monthlyFee);
+          if (values.firstTimeFee) {
+            setValue("firstTimeFees", values.firstTimeFee);
+          }
+
+          if (values.currency === "usd") {
+            setSelectedCurrency([0]);
+          } else if (values?.currency === "kes") {
+            setSelectedCurrency([1]);
+          }
+
+          if (values.bookingOption === "instant") {
+            setSelectedBookingOption([0]);
+          } else if (values?.bookingOption === "request") {
+            setSelectedBookingOption([1]);
+          }
+        } else {
+          setDefaultValues(undefined);
+        }
+        setIsLoading(false);
+      } else {
+        setDefaultValues(undefined);
+        setIsLoading(false);
+      }
+    };
+
+    getDefaultValues();
+  }, [form.homeId]);
 
   useEffect(() => {
     if (selectedCurrency.length > 0) {
@@ -50,12 +104,49 @@ export default function FeesForm(form: formProps) {
     }
   }, [selectedBookingOption]);
 
-  const onSubmit = (data: schema) => {
-    console.log(data);
+  const onSubmit = async (data: schema) => {
+    setIsSubmitting(true);
+    if (defaultValues == undefined) {
+      await addOrUpdateFeesInformation({
+        feesId: null,
+        homeId: form.homeId as number,
+        currency: data.currency,
+        monthlyFees: data.monthlyFees,
+        firstTimeFees:
+          data.firstTimeFees != undefined ? data.firstTimeFees : null,
+        firstTimeFeesDescription:
+          data.firstTimeFeesDescription != undefined
+            ? data.firstTimeFeesDescription
+            : null,
+        bookingOption: data.bookingOption,
+      });
+    } else {
+      await addOrUpdateFeesInformation({
+        feesId: defaultValues.feesId,
+        homeId: form.homeId as number,
+        currency: data.currency,
+        monthlyFees: data.monthlyFees,
+        firstTimeFees:
+          data.firstTimeFees != undefined ? data.firstTimeFees : null,
+        firstTimeFeesDescription:
+          data.firstTimeFeesDescription != undefined
+            ? data.firstTimeFeesDescription
+            : null,
+        bookingOption: data.bookingOption,
+      });
+    }
+
     form.submitFunctions.map((submitFunction: () => void) => {
       submitFunction();
     });
+    setIsSubmitting(false);
   };
+
+  {
+    if (isLoading) {
+      return <p>Loading...</p>;
+    }
+  }
 
   return (
     <form
@@ -68,7 +159,7 @@ export default function FeesForm(form: formProps) {
         <OptionContainer
           options={["US Dollars", "Kenyan Shillings"]}
           multipleSelectionEnabled={false}
-          selectedOptions={[]}
+          selectedOptions={selectedCurrency}
           setSelectedOptions={setSelectedCurrency}
         />
         {errors.currency && (
@@ -93,18 +184,20 @@ export default function FeesForm(form: formProps) {
           >
             <p>{selectedCurrency[0] === 0 ? "$" : "KES"}</p>
             <CurrencyInput
+              defaultValue={watch("monthlyFees")}
+              {...register("monthlyFees", {
+                setValueAs: (v) => (v === "" ? "undefined" : parseInt(v, 10)),
+              })}
               ref={regularFeesInputRef}
-              type="text"
-              placeholder="0"
               onChange={(e) => {
-                setValue("regularFees", Number(e.currentTarget.value));
+                setValue("monthlyFees", Number(e.currentTarget.value));
               }}
             />
           </button>
         </div>
-        {errors.regularFees && (
+        {errors.monthlyFees && (
           <p className="text-red-500 font-semibold">
-            {errors.regularFees.message}
+            {errors.monthlyFees.message}
           </p>
         )}
       </div>
@@ -127,11 +220,20 @@ export default function FeesForm(form: formProps) {
         >
           <p>{selectedCurrency[0] === 0 ? "$" : "KES"}</p>
           <CurrencyInput
+            defaultValue={
+              watch("firstTimeFees") != undefined ? watch("firstTimeFees") : ""
+            }
+            {...register("firstTimeFees", {
+              setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
+            })}
             ref={firstTimeFeesInputRef}
-            type="text"
-            placeholder="0"
             onChange={(e) => {
-              setValue("firstTimeFees", Number(e.currentTarget.value));
+              setValue(
+                "firstTimeFees",
+                e.currentTarget.value != ""
+                  ? Number(e.currentTarget.value)
+                  : undefined
+              );
             }}
           />
         </button>
@@ -142,7 +244,14 @@ export default function FeesForm(form: formProps) {
         )}
         <p>Description (optional)</p>
         <Textarea
-          {...register("firstTimeFeesDescription")}
+          {...register("firstTimeFeesDescription", {
+            setValueAs: (v) => (v === "" ? undefined : v),
+          })}
+          defaultValue={
+            defaultValues?.firstTimeFeeDescription
+              ? defaultValues?.firstTimeFeeDescription
+              : ""
+          }
           placeholder="Describe the included fees and other details here"
         />
         {errors.firstTimeFeesDescription && (
@@ -162,7 +271,7 @@ export default function FeesForm(form: formProps) {
         <OptionContainer
           options={["Instant Book", "Accept or Decline Booking Requests"]}
           multipleSelectionEnabled={false}
-          selectedOptions={[]}
+          selectedOptions={selectedBookingOption}
           setSelectedOptions={setSelectedBookingOption}
         />
         {errors.bookingOption && (
@@ -172,17 +281,21 @@ export default function FeesForm(form: formProps) {
         )}
       </div>
       <div className="w-full flex flex-row gap-3 justify-end p-3">
-        <Button
-          variant={"outline"}
-          onClick={() =>
-            form.backFunctions.map((backFunction: () => void) => {
-              backFunction();
-            })
-          }
-        >
-          Back
+        {form.backFunctions.length > 0 && (
+          <Button
+            variant={"outline"}
+            onClick={() =>
+              form.backFunctions.map((backFunction: () => void) => {
+                backFunction();
+              })
+            }
+          >
+            Back
+          </Button>
+        )}
+        <Button type="submit" disabled={isSubmitting}>
+          Save and continue
         </Button>
-        <Button type="submit">Next</Button>
       </div>
     </form>
   );

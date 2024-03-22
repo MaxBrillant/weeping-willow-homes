@@ -1,4 +1,7 @@
-import { SupabaseClient } from "@supabase/supabase-js";
+"use server";
+
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 
 type returnedStayDetailsType = Array<{
   id: number;
@@ -72,10 +75,9 @@ type stayDetailsType = {
     houseInformation: string | null;
   };
 };
-export default async function getStayDetails(
-  supabase: SupabaseClient,
-  stayId: number
-) {
+export default async function getStayDetails(stayId: number) {
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore });
   const user = await supabase.auth.getUser();
   const userId = user.data.user?.id;
   const { data, error } = await supabase
@@ -95,8 +97,8 @@ export default async function getStayDetails(
         "home_location(longitude, latitude), " +
         "house_rules_and_information(events_allowed, pets_allowed, smoking_allowed, start_of_quiet_hours, end_of_quiet_hours, additional_rules, house_information))"
     )
-    .eq("id", stayId)
     .eq("user_profile.user_id", userId)
+    .eq("id", stayId)
     .returns<returnedStayDetailsType>();
 
   if (error) {

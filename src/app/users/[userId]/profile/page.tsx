@@ -21,7 +21,7 @@ export default async function Profile({
 
   const activeUserId = (await supabase.auth.getUser()).data.user?.id;
 
-  const userProfile = await getUserProfile(supabase, stayId);
+  const userProfile = await getUserProfile(stayId);
 
   const formatLanguages = (languages: string[]): string => {
     if (languages.length === 1) {

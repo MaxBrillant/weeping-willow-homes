@@ -42,6 +42,7 @@ const CurrencyInput = React.forwardRef<HTMLInputElement, InputProps>(
       // Attach the event listener once the component mounts
       const inputElement = localRef.current;
       if (inputElement) {
+        resizeInput();
         inputElement.addEventListener("input", resizeInput);
       }
 

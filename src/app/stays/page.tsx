@@ -18,7 +18,7 @@ export default async function Stays() {
     redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
   }
 
-  const stays = await getListOfStays(supabase);
+  const stays = await getListOfStays();
 
   if (stays.length === 0) {
     return (

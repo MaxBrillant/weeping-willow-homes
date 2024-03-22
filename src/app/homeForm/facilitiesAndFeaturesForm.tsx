@@ -7,22 +7,32 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import OptionContainer from "../components/optionContainer";
 import { Button } from "@/components/ui/button";
-import {
-  facilities,
-  features,
-  securityAndSafetyFacilities,
-} from "@/data/facilitiesAndFeatures";
+import getFacilitiesAndFeaturesDefaultValues from "@/api/defaultValues/facilitiesAndFeaturesForm";
+import { addOrUpdateFacilitiesAndFeatures } from "@/api/mutations/facilitiesAndFeaturesMutations";
 
 type schema = z.infer<typeof FacilitiesAndFeaturesFormSchema>;
 
 type formProps = {
   backFunctions: (() => void | undefined)[];
   submitFunctions: (() => void | undefined)[];
+  homeId: number | null;
+};
+type facilitiesType = {
+  id: string;
+  title: string;
+  iconUrl: string;
+  description: string | null;
+  type: "facility" | "safety" | "feature";
+};
+type defaultValuesType = {
+  selectedIds: string[];
 };
 export default function FacilitiesAndFeaturesForm(form: formProps) {
+  const [defaultValues, setDefaultValues] = useState<
+    defaultValuesType | undefined
+  >({ selectedIds: [] });
   const {
     handleSubmit,
-    watch,
     setValue,
     formState: { errors },
   } = useForm<schema>({
@@ -36,38 +46,153 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
   >([]);
   const [selectedFeatures, setSelectedFeatures] = useState<number[]>([]);
 
-  const facilitiesList = facilities;
-  const safetyFacilitiesList = securityAndSafetyFacilities;
-  const featuresList = features;
+  const [facilitiesList, setFacilitiesList] = useState<facilitiesType[]>([]);
+  const [safetyFacilitiesList, setSafetyFacilitiesList] = useState<
+    facilitiesType[]
+  >([]);
+  const [featuresList, setFeaturesList] = useState<facilitiesType[]>([]);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const selectedIds: string[] = selectedFacilities.map(
-      (index) => facilitiesList[index].title
-    );
-    setValue("facilities", selectedIds);
+    const getDefaultValues = async () => {
+      if (form.homeId) {
+        setIsLoading(true);
+        const values = await getFacilitiesAndFeaturesDefaultValues(form.homeId);
+        if (values) {
+          setDefaultValues({
+            selectedIds: values
+              .filter((value) => value.homeFacilityAndFeatureId !== null)
+              .map((value) => value.id as string),
+          });
+          setFacilitiesList(
+            values.filter((facility) => facility.type === "facility")
+          );
+          setSafetyFacilitiesList(
+            values.filter((facility) => facility.type === "safety")
+          );
+          setFeaturesList(
+            values.filter((facility) => facility.type === "feature")
+          );
+
+          setSelectedFacilities(
+            values.reduce((acc, facility, index) => {
+              if (
+                facility.type === "facility" &&
+                facility.homeFacilityAndFeatureId
+              ) {
+                acc.push(index);
+              }
+              return acc;
+            }, [] as number[])
+          );
+          setSelectedSafetyFacilities(
+            values.reduce((acc, facility, index) => {
+              if (
+                facility.type === "safety" &&
+                facility.homeFacilityAndFeatureId
+              ) {
+                acc.push(
+                  index -
+                    values.filter((facility) => facility.type === "facility")
+                      .length
+                );
+              }
+              return acc;
+            }, [] as number[])
+          );
+          setSelectedFeatures(
+            values.reduce((acc, facility, index) => {
+              if (
+                facility.type === "feature" &&
+                facility.homeFacilityAndFeatureId
+              ) {
+                acc.push(
+                  index -
+                    values.filter((facility) => facility.type === "facility")
+                      .length -
+                    values.filter((facility) => facility.type === "safety")
+                      .length
+                );
+              }
+              return acc;
+            }, [] as number[])
+          );
+        } else {
+          setDefaultValues(undefined);
+        }
+        setIsLoading(false);
+      } else {
+        setDefaultValues(undefined);
+        setIsLoading(false);
+      }
+    };
+    getDefaultValues();
+  }, [form.homeId]);
+
+  useEffect(() => {
+    if (facilitiesList.length > 0) {
+      const selectedIds = selectedFacilities.map(
+        (index) => facilitiesList[index].id
+      );
+      setValue("facilities", selectedIds);
+    }
   }, [selectedFacilities]);
 
   useEffect(() => {
-    const selectedIds: string[] = selectedSafetyFacilities.map(
-      (index) => safetyFacilitiesList[index].title
-    );
-    setValue("safetyAndSecurity", selectedIds);
+    if (safetyFacilitiesList.length > 0) {
+      const selectedIds = selectedSafetyFacilities.map(
+        (index) => safetyFacilitiesList[index].id
+      );
+      setValue("safetyAndSecurity", selectedIds);
+    }
   }, [selectedSafetyFacilities]);
 
   useEffect(() => {
-    const selectedIds: string[] = selectedFeatures.map(
-      (index) => featuresList[index].title
-    );
-    setValue("features", selectedIds);
+    if (featuresList.length > 0) {
+      const selectedIds = selectedFeatures.map(
+        (index) => featuresList[index].id
+      );
+      setValue("features", selectedIds);
+    }
   }, [selectedFeatures]);
 
-  const onSubmit = (data: schema) => {
-    //RANK FACILITIES BY QUALITY
-    console.log(data);
+  const onSubmit = async (data: schema) => {
+    setIsSubmitting(true);
+    const allFacilities = data.facilities.concat(
+      data.safetyAndSecurity,
+      data.features
+    );
+    if (defaultValues != undefined) {
+      const newFacilities = allFacilities.filter(
+        (facility) => !defaultValues?.selectedIds.includes(facility)
+      );
+      const faciltiesToDelete = defaultValues.selectedIds.filter(
+        (id) => !allFacilities.includes(id)
+      );
+      await addOrUpdateFacilitiesAndFeatures({
+        homeId: form.homeId as number,
+        newFacilities: newFacilities,
+        facilitiesToDelete: faciltiesToDelete,
+      });
+    } else {
+      await addOrUpdateFacilitiesAndFeatures({
+        homeId: form.homeId as number,
+        newFacilities: allFacilities,
+        facilitiesToDelete: [],
+      });
+    }
+
     form.submitFunctions.map((submitFunction: () => void) => {
       submitFunction();
     });
+    setIsSubmitting(false);
   };
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <form
@@ -84,7 +209,7 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
         <OptionContainer
           options={facilitiesList.map((facility) => facility.title)}
           multipleSelectionEnabled={true}
-          selectedOptions={[]}
+          selectedOptions={selectedFacilities}
           setSelectedOptions={setSelectedFacilities}
         />
         {errors.facilities && (
@@ -103,7 +228,7 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
         <OptionContainer
           options={safetyFacilitiesList.map((facility) => facility.title)}
           multipleSelectionEnabled={true}
-          selectedOptions={[]}
+          selectedOptions={selectedSafetyFacilities}
           setSelectedOptions={setSelectedSafetyFacilities}
         />
         {errors.safetyAndSecurity && (
@@ -121,7 +246,7 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
         <OptionContainer
           options={featuresList.map((feature) => feature.title)}
           multipleSelectionEnabled={true}
-          selectedOptions={[]}
+          selectedOptions={selectedFeatures}
           setSelectedOptions={setSelectedFeatures}
         />
         {errors.features && (
@@ -131,17 +256,21 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
         )}
       </div>
       <div className="w-full flex flex-row gap-3 justify-end p-3">
-        <Button
-          variant={"outline"}
-          onClick={() =>
-            form.backFunctions.map((backFunction: () => void) => {
-              backFunction();
-            })
-          }
-        >
-          Back
+        {form.backFunctions.length > 0 && (
+          <Button
+            variant={"outline"}
+            onClick={() =>
+              form.backFunctions.map((backFunction: () => void) => {
+                backFunction();
+              })
+            }
+          >
+            Back
+          </Button>
+        )}
+        <Button type="submit" disabled={isSubmitting}>
+          Save and continue
         </Button>
-        <Button type="submit">Next</Button>
       </div>
     </form>
   );

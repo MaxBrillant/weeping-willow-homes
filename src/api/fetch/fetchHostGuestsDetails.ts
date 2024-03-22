@@ -1,4 +1,7 @@
-import { SupabaseClient } from "@supabase/supabase-js";
+"use server";
+
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 
 type returnedHostGuestsDetailsType = Array<{
   id: number;
@@ -49,10 +52,9 @@ type hostGuestsDetailsType = {
   home: { id: number; title: string; coverPhotoUrl: string };
 };
 
-export default async function getHostGuestsDetaills(
-  supabase: SupabaseClient,
-  stayId: number
-) {
+export default async function getHostGuestsDetaills(stayId: number) {
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore });
   const userId = (await supabase.auth.getUser()).data.user?.id;
   const { data, error } = await supabase
     .from("stays")
@@ -69,8 +71,8 @@ export default async function getHostGuestsDetaills(
         "home_photos(cover_photo), " +
         "user_profile!inner(user_id))"
     )
-    .eq("id", stayId)
     .eq("homes.user_profile.user_id", userId)
+    .eq("id", stayId)
     .returns<returnedHostGuestsDetailsType>();
 
   if (error) {

@@ -6,18 +6,26 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import NumberSelection from "../components/numberSelection";
+import getAccommodationInformationDefaultValues from "@/api/defaultValues/accommodationInformation";
+import { addOrUpdateAccommodationInformation } from "@/api/mutations/accomodationInformationMutations";
 
 type schema = z.infer<typeof AccommodationFormSchema>;
 
 type formProps = {
   backFunctions: (() => void | undefined)[];
   submitFunctions: (() => void | undefined)[];
+  homeId: number | null;
+};
+
+type defaultValuesType = {
+  accommodationId: number;
 };
 export default function AccommodationForm(form: formProps) {
+  const [defaultValues, setDefaultValues] = useState<
+    defaultValuesType | undefined
+  >();
   const {
-    register,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors },
   } = useForm<schema>({
@@ -32,6 +40,37 @@ export default function AccommodationForm(form: formProps) {
     useState<number>(1);
   const [numberOfSharedBathrooms, setNumberOfSharedBathrooms] =
     useState<number>(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const getDefaultValues = async () => {
+      if (form.homeId) {
+        setIsLoading(true);
+        const values = await getAccommodationInformationDefaultValues(
+          form.homeId
+        );
+        if (values) {
+          setDefaultValues({
+            accommodationId: values.accommodationId,
+          });
+          setNumberOfGuests(values.numberOfGuests);
+          setNumberOfBedrooms(values.numberOfBedrooms);
+          setNumberOfBeds(values.numberOfBeds);
+          setNumberOfPrivateBathrooms(values.numberOfPrivateBathrooms);
+          setNumberOfSharedBathrooms(values.numberOfSharedBathrooms);
+        } else {
+          setDefaultValues(undefined);
+        }
+        setIsLoading(false);
+      } else {
+        setDefaultValues(undefined);
+        setIsLoading(false);
+      }
+    };
+
+    getDefaultValues();
+  }, [form.homeId]);
 
   useEffect(() => {
     setValue("numberOfGuests", numberOfGuests);
@@ -55,12 +94,38 @@ export default function AccommodationForm(form: formProps) {
   }),
     [numberOfSharedBathrooms];
 
-  const onSubmit = (data: schema) => {
-    console.log(data);
+  const onSubmit = async (data: schema) => {
+    setIsSubmitting(true);
+    if (defaultValues == undefined) {
+      await addOrUpdateAccommodationInformation({
+        accommodationId: null,
+        homeId: form.homeId as number,
+        guests: data.numberOfGuests,
+        bedrooms: data.numberOfBedrooms,
+        beds: data.numberOfBeds,
+        privateBathrooms: data.numberOfPrivateBathrooms,
+        sharedBathrooms: data.numberOfSharedBathrooms,
+      });
+    } else {
+      await addOrUpdateAccommodationInformation({
+        accommodationId: defaultValues.accommodationId,
+        homeId: form.homeId as number,
+        guests: data.numberOfGuests,
+        bedrooms: data.numberOfBedrooms,
+        beds: data.numberOfBeds,
+        privateBathrooms: data.numberOfPrivateBathrooms,
+        sharedBathrooms: data.numberOfSharedBathrooms,
+      });
+    }
     form.submitFunctions.map((submitFunction: () => void) => {
       submitFunction();
     });
+    setIsSubmitting(false);
   };
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <form
@@ -158,17 +223,21 @@ export default function AccommodationForm(form: formProps) {
         </div>
       </div>
       <div className="w-full flex flex-row gap-3 justify-end p-3">
-        <Button
-          variant={"outline"}
-          onClick={() =>
-            form.backFunctions.map((backFunction: () => void) => {
-              backFunction();
-            })
-          }
-        >
-          Back
+        {form.backFunctions.length > 0 && (
+          <Button
+            variant={"outline"}
+            onClick={() =>
+              form.backFunctions.map((backFunction: () => void) => {
+                backFunction();
+              })
+            }
+          >
+            Back
+          </Button>
+        )}
+        <Button type="submit" disabled={isSubmitting}>
+          Save and continue
         </Button>
-        <Button type="submit">Next</Button>
       </div>
     </form>
   );

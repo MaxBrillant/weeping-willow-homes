@@ -1,4 +1,7 @@
-import { SupabaseClient } from "@supabase/supabase-js";
+"use server";
+
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 
 type returnedProfiletype = Array<{
   id: number;
@@ -21,10 +24,9 @@ type profileType = {
   cityAddress: "Nairobi, Kenya" | "Mombasa, Kenya";
   isIdentityVerified: boolean;
 };
-export default async function getUserProfile(
-  supabase: SupabaseClient,
-  userId: number
-) {
+export default async function getUserProfile(userId: number) {
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore });
   const { data, error } = await supabase
     .from("user_profile")
     .select(
@@ -55,10 +57,9 @@ export default async function getUserProfile(
   return profile;
 }
 
-export async function getUserBasicInfo(
-  supabase: SupabaseClient,
-  userId: string
-) {
+export async function getUserBasicInfo(userId: string) {
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore });
   type returnedBasicInfo = Array<{
     id: number;
     full_name: string;

@@ -19,7 +19,7 @@ export default async function Account() {
     redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
   }
   if (session.user.id != undefined) {
-    const basicInfo = await getUserBasicInfo(supabase, session.user.id);
+    const basicInfo = await getUserBasicInfo(session.user.id);
 
     if (basicInfo == undefined) {
       //TODO Collect the user's information
