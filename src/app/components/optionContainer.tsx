@@ -42,14 +42,12 @@ export default function OptionContainer(container: containerProps) {
                 setSelectedOptions([]);
                 container.setSelectedOptions([]);
               }
-              setSelectedOptions((currentlySelectedOptions) => [
-                ...currentlySelectedOptions,
-                index,
-              ]);
-              container.setSelectedOptions((currentlySelectedOptions) => [
-                ...currentlySelectedOptions,
-                index,
-              ]);
+              setSelectedOptions((currentlySelectedOptions) =>
+                [...currentlySelectedOptions, index].sort((a, b) => a - b)
+              );
+              container.setSelectedOptions((currentlySelectedOptions) =>
+                [...currentlySelectedOptions, index].sort((a, b) => a - b)
+              );
             }}
             className="py-1 px-2 min-w-10 min-h-10 h-fit border border-black rounded-lg"
           >

@@ -1,4 +1,7 @@
-import { SupabaseClient } from "@supabase/supabase-js";
+"use server";
+
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 
 type returnedHostHomesType = Array<{
   id: number;
@@ -19,7 +22,9 @@ type hostHomesType = Array<{
   coverPhotoUrl: string;
   status: "in-progress" | "completed" | "verified";
 }>;
-export default async function getAllHostHomes(supabase: SupabaseClient) {
+export default async function getAllHostHomes() {
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore });
   const userId = (await supabase.auth.getUser()).data.user?.id;
   const { data, error } = await supabase
     .from("homes")

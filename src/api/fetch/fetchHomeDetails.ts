@@ -1,4 +1,7 @@
-import { supabase } from "../../../utils/supabaseClient";
+"use server";
+
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 
 type returnedHomeDetailsType = Array<{
   id: number;
@@ -118,6 +121,8 @@ export type homeDetailsType = {
 };
 
 export async function getHomeDetails(id: number) {
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore });
   const { data, error } = await supabase
     .from("homes")
     .select(
@@ -241,6 +246,8 @@ export type homePhotosType = {
   additional: string[];
 };
 export async function getHomePhotos(id: number) {
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore });
   const { data, error } = await supabase
     .from("homes")
     .select(

@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import LocationSelection from "../components/locationSelection";
 import Map from "../components/map";
 import { setKey, fromAddress, fromLatLng } from "react-geocode";
+import getLocationInformationDefaultValues from "@/api/defaultValues/locationForm";
+import { addOrUpdateLocationInformation } from "@/api/mutations/locationMutations";
 
 const GOOGLE_MAPS_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
 
@@ -19,8 +21,19 @@ type schema = z.infer<typeof LocationFormSchema>;
 type formProps = {
   backFunctions: (() => void | undefined)[];
   submitFunctions: (() => void | undefined)[];
+  homeId: number | null;
+};
+
+type defaultValuesType = {
+  locationId: number;
+  streetAddress: string;
+  buildingName: string;
 };
 export default function LocationForm(form: formProps) {
+  const [defaultValues, setDefaultValues] = useState<
+    defaultValuesType | undefined
+  >();
+
   const {
     register,
     handleSubmit,
@@ -40,6 +53,42 @@ export default function LocationForm(form: formProps) {
   const [adjustedCoordinates, setAdjustedCoordinates] = useState<number[]>([]);
   const [isAdjustingMap, setIsAdjustingMap] = useState(false);
   setKey(GOOGLE_MAPS_KEY as string);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const getDefaultValues = async () => {
+      if (form.homeId) {
+        setIsLoading(true);
+        const values = await getLocationInformationDefaultValues(form.homeId);
+        if (values) {
+          setDefaultValues({
+            locationId: values.locationId,
+            streetAddress: values.streetAddress,
+            buildingName: values.buildingName,
+          });
+          setValue("streetAddress", values.streetAddress);
+          if (values.city === "Nairobi, Kenya") {
+            setSelectedCity([0]);
+          } else if (values.city === "Mombasa, Kenya") {
+            setSelectedCity([1]);
+          }
+          setTimeout(function () {
+            setCoordinates([values.longitude, values.latitude]);
+            setIsMapVisible(true);
+          }, 1000);
+        } else {
+          setDefaultValues(undefined);
+        }
+        setIsLoading(false);
+      } else {
+        setDefaultValues(undefined);
+        setIsLoading(false);
+      }
+    };
+
+    getDefaultValues();
+  }, [form.homeId]);
 
   useEffect(() => {
     if (selectedCity.length > 0) {
@@ -57,9 +106,30 @@ export default function LocationForm(form: formProps) {
     setValue("latitude", coordinates[1]);
   }, [coordinates]);
 
-  const onSubmit = (data: schema) => {
+  const onSubmit = async (data: schema) => {
+    setIsSubmitting(true);
     if (coordinates[0] !== 0 && coordinates[1] !== 0) {
-      console.log(data);
+      if (defaultValues == undefined) {
+        await addOrUpdateLocationInformation({
+          locationId: null,
+          homeId: form.homeId as number,
+          city: data.city,
+          longitude: data.longitude,
+          latitude: data.latitude,
+          streetAddress: data.streetAddress,
+          buildingName: data.buildingName,
+        });
+      } else {
+        await addOrUpdateLocationInformation({
+          locationId: defaultValues.locationId,
+          homeId: form.homeId as number,
+          city: data.city,
+          longitude: data.longitude,
+          latitude: data.latitude,
+          streetAddress: data.streetAddress,
+          buildingName: data.buildingName,
+        });
+      }
       form.submitFunctions.map((submitFunction: () => void) => {
         submitFunction();
       });
@@ -73,6 +143,7 @@ export default function LocationForm(form: formProps) {
         })
         .catch(() => setAddressNotFound(true));
     }
+    setIsSubmitting(false);
   };
 
   const getUserLocation = () => {
@@ -82,16 +153,15 @@ export default function LocationForm(form: formProps) {
     }
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        isMapVisible && setIsMapVisible(false);
+        coordinates[0] !== 0 && coordinates[1] !== 0 && setCoordinates([0, 0]);
+
         fromLatLng(position.coords.latitude, position.coords.longitude)
           .then(({ results }) => {
             setValue("streetAddress", results[0].formatted_address);
             if (liveAddressRef.current) {
               liveAddressRef.current.value = results[0].formatted_address;
             }
-            isMapVisible && setIsMapVisible(false);
-            coordinates[0] !== 0 &&
-              coordinates[1] !== 0 &&
-              setCoordinates([0, 0]);
           })
           .catch(() => setAddressNotFound(true));
       },
@@ -100,6 +170,10 @@ export default function LocationForm(form: formProps) {
       }
     );
   };
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <form
@@ -120,7 +194,7 @@ export default function LocationForm(form: formProps) {
         <OptionContainer
           options={["Nairobi", "Mombasa"]}
           multipleSelectionEnabled={false}
-          selectedOptions={[]}
+          selectedOptions={selectedCity}
           setSelectedOptions={setSelectedCity}
         />
         {errors.city && (
@@ -150,6 +224,7 @@ export default function LocationForm(form: formProps) {
               coordinates[1] !== 0 &&
               setCoordinates([0, 0]);
           }}
+          defaultValue={defaultValues?.streetAddress}
         />
         {errors.streetAddress && (
           <p className="text-red-500 font-semibold">
@@ -170,6 +245,7 @@ export default function LocationForm(form: formProps) {
                 setCoordinates([0, 0]);
             }
           }}
+          defaultValue={defaultValues?.buildingName}
         />
         {errors.buildingName && (
           <p className="text-red-500 font-semibold">
@@ -185,7 +261,7 @@ export default function LocationForm(form: formProps) {
           or place near your home
         </p>
       )}
-      <Button type="submit">See map</Button>
+      {!isMapVisible && <Button type="submit">See map</Button>}
       {isMapVisible && (
         <div>
           <p className="font-semibold text-lg">Location on the map</p>
@@ -241,7 +317,11 @@ export default function LocationForm(form: formProps) {
           Back
         </Button>
 
-        {isMapVisible && <Button type="submit">Next</Button>}
+        {isMapVisible && (
+          <Button type="submit" disabled={isSubmitting}>
+            Next
+          </Button>
+        )}
       </div>
     </form>
   );

@@ -1,4 +1,7 @@
-import { SupabaseClient } from "@supabase/supabase-js";
+"use server";
+
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 
 type returnedHostGuestsType = Array<{
   id: number;
@@ -37,7 +40,9 @@ type hostGuestsType = Array<{
     | "checked-out"
     | "cancelled";
 }>;
-export default async function getAllHostguests(supabase: SupabaseClient) {
+export default async function getAllHostguests() {
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore });
   const userId = (await supabase.auth.getUser()).data.user?.id;
   const { data, error } = await supabase
     .from("stays")

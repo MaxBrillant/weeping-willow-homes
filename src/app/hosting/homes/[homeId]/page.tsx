@@ -22,7 +22,7 @@ export default async function Home({ params }: { params: { homeId: number } }) {
     redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
   }
 
-  const hostHomeDetails = await getHostHomeDetails(supabase, homeId);
+  const hostHomeDetails = await getHostHomeDetails(homeId);
 
   console.log(hostHomeDetails);
 
@@ -64,7 +64,11 @@ export default async function Home({ params }: { params: { homeId: number } }) {
             </div>
             <div>
               <p className="font-medium text-lg">Property size</p>
-              <p>{hostHomeDetails.propertySize} square meters</p>
+              {hostHomeDetails.propertySize ? (
+                <p>{hostHomeDetails.propertySize} square meters</p>
+              ) : (
+                <p>Not provided.</p>
+              )}
             </div>
           </div>
         </div>

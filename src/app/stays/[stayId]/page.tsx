@@ -26,7 +26,7 @@ export default async function StayDetails({
     redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
   }
 
-  const stayDetails = await getStayDetails(supabase, stayId);
+  const stayDetails = await getStayDetails(stayId);
 
   console.log(stayDetails);
 

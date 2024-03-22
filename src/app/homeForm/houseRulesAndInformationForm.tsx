@@ -19,6 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import getHouseRulesAndInformationDefaultValues from "@/api/defaultValues/houseRulesAndInformationForm";
+import { addOrUpdateHouseRulesAndInformation } from "@/api/mutations/houseRulesAndInformationMutations";
 
 type schema = z.infer<typeof HouseRulesAndInformationFormSchema>;
 type hoursType = z.infer<typeof hours>;
@@ -26,10 +28,22 @@ type hoursType = z.infer<typeof hours>;
 type formProps = {
   backFunctions: (() => void | undefined)[];
   submitFunctions: (() => void | undefined)[];
+  homeId: number | null;
 };
+type defaultValuesType = {
+  houseRulesAndInformationId: number;
+  additionalRules: string | null;
+  houseInformation: string | null;
+};
+
 export default function HouseRulesAndInformation(form: formProps) {
+  const [defaultValues, setDefaultValues] = useState<
+    defaultValuesType | undefined
+  >();
+
   const {
     register,
+    watch,
     handleSubmit,
     setValue,
     formState: { errors },
@@ -47,6 +61,65 @@ export default function HouseRulesAndInformation(form: formProps) {
   const [selectedOptionForSmoking, setSelectedOptionForSmoking] = useState<
     number[]
   >([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const getDefaultValues = async () => {
+      if (form.homeId) {
+        setIsLoading(true);
+        const values = await getHouseRulesAndInformationDefaultValues(
+          form.homeId
+        );
+        if (values) {
+          setDefaultValues({
+            houseRulesAndInformationId: values.houseRulesAndInformationId,
+            additionalRules: values.additionalRules,
+            houseInformation: values.houseInformation,
+          });
+
+          setValue(
+            "startOfQuietHours",
+            values.startOfQuietHours != undefined
+              ? (values.startOfQuietHours as hoursType)
+              : undefined
+          );
+          setValue(
+            "endOfQuietHours",
+            values.endOfQuietHours != undefined
+              ? (values.endOfQuietHours as hoursType)
+              : undefined
+          );
+
+          if (values.eventsAllowed === true) {
+            setSelectedOptionForEvents([0]);
+          } else if (values.eventsAllowed === false) {
+            setSelectedOptionForEvents([1]);
+          }
+
+          if (values.petsAllowed === true) {
+            setSelectedOptionForPets([0]);
+          } else if (values.petsAllowed === false) {
+            setSelectedOptionForPets([1]);
+          }
+
+          if (values.smokingAllowed === true) {
+            setSelectedOptionForSmoking([0]);
+          } else if (values.smokingAllowed === false) {
+            setSelectedOptionForSmoking([1]);
+          }
+        } else {
+          setDefaultValues(undefined);
+        }
+        setIsLoading(false);
+      } else {
+        setDefaultValues(undefined);
+        setIsLoading(false);
+      }
+    };
+
+    getDefaultValues();
+  }, [form.homeId]);
 
   useEffect(() => {
     if (selectedOptionForEvents.length > 0) {
@@ -54,12 +127,16 @@ export default function HouseRulesAndInformation(form: formProps) {
         "eventsAllowed",
         selectedOptionForEvents[0] === 0 ? true : false
       );
+    } else {
+      setValue("eventsAllowed", undefined);
     }
   }, [selectedOptionForEvents]);
 
   useEffect(() => {
     if (selectedOptionForPets.length > 0) {
       setValue("petsAllowed", selectedOptionForPets[0] === 0 ? true : false);
+    } else {
+      setValue("petsAllowed", undefined);
     }
   }, [selectedOptionForPets]);
 
@@ -69,16 +146,60 @@ export default function HouseRulesAndInformation(form: formProps) {
         "smokingAllowed",
         selectedOptionForSmoking[0] === 0 ? true : false
       );
+    } else {
+      setValue("smokingAllowed", undefined);
     }
   }, [selectedOptionForSmoking]);
 
-  const onSubmit = (data: schema) => {
-    console.log(data);
+  const onSubmit = async (data: schema) => {
+    setIsSubmitting(true);
+    if (defaultValues == undefined) {
+      await addOrUpdateHouseRulesAndInformation({
+        houseRulesAndInformationId: null,
+        homeId: form.homeId as number,
+        eventsAllowed:
+          data.eventsAllowed != undefined ? data.eventsAllowed : null,
+        petsAllowed: data.petsAllowed != undefined ? data.petsAllowed : null,
+        smokingAllowed:
+          data.smokingAllowed != undefined ? data.smokingAllowed : null,
+        startOfQuietHours:
+          data.startOfQuietHours != undefined ? data.startOfQuietHours : null,
+        endOfQuietHours:
+          data.endOfQuietHours != undefined ? data.endOfQuietHours : null,
+        additionalRules:
+          data.additionalRules != undefined ? data.additionalRules : null,
+        houseInformation:
+          data.houseInformation != undefined ? data.houseInformation : null,
+      });
+    } else {
+      await addOrUpdateHouseRulesAndInformation({
+        houseRulesAndInformationId: defaultValues.houseRulesAndInformationId,
+        homeId: form.homeId as number,
+        eventsAllowed:
+          data.eventsAllowed != undefined ? data.eventsAllowed : null,
+        petsAllowed: data.petsAllowed != undefined ? data.petsAllowed : null,
+        smokingAllowed:
+          data.smokingAllowed != undefined ? data.smokingAllowed : null,
+        startOfQuietHours:
+          data.startOfQuietHours != undefined ? data.startOfQuietHours : null,
+        endOfQuietHours:
+          data.endOfQuietHours != undefined ? data.endOfQuietHours : null,
+        additionalRules:
+          data.additionalRules != undefined ? data.additionalRules : null,
+        houseInformation:
+          data.houseInformation != undefined ? data.houseInformation : null,
+      });
+    }
+
     form.submitFunctions.map((submitFunction: () => void) => {
       submitFunction();
     });
+    setIsSubmitting(false);
   };
 
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -100,7 +221,7 @@ export default function HouseRulesAndInformation(form: formProps) {
         <OptionContainer
           options={["Yes", "No"]}
           multipleSelectionEnabled={false}
-          selectedOptions={[]}
+          selectedOptions={selectedOptionForEvents}
           setSelectedOptions={setSelectedOptionForEvents}
         />
       </div>
@@ -120,7 +241,7 @@ export default function HouseRulesAndInformation(form: formProps) {
         <OptionContainer
           options={["Yes", "No"]}
           multipleSelectionEnabled={false}
-          selectedOptions={[]}
+          selectedOptions={selectedOptionForPets}
           setSelectedOptions={setSelectedOptionForPets}
         />
       </div>
@@ -137,7 +258,7 @@ export default function HouseRulesAndInformation(form: formProps) {
         <OptionContainer
           options={["Yes", "No"]}
           multipleSelectionEnabled={false}
-          selectedOptions={[]}
+          selectedOptions={selectedOptionForSmoking}
           setSelectedOptions={setSelectedOptionForSmoking}
         />
       </div>
@@ -149,8 +270,9 @@ export default function HouseRulesAndInformation(form: formProps) {
           environment for all guests.
         </p>
         <Select
-          onValueChange={(e: hoursType) => {
-            setValue("startOfQuietHours", e);
+          defaultValue={watch("startOfQuietHours")}
+          onValueChange={(e: hoursType | "No time set") => {
+            setValue("startOfQuietHours", e === "No time set" ? undefined : e);
           }}
         >
           <SelectTrigger className="w-[180px]">
@@ -158,6 +280,7 @@ export default function HouseRulesAndInformation(form: formProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
+              <SelectItem value="No time set">No time set</SelectItem>
               {Object.values(hours.Values).map((hour, index) => {
                 return (
                   <SelectItem key={index} value={hour}>
@@ -168,14 +291,16 @@ export default function HouseRulesAndInformation(form: formProps) {
             </SelectGroup>
           </SelectContent>
         </Select>
-        {errors.startOfQuietHours && (
-          <p className="text-red-500 font-semibold">
-            {errors.startOfQuietHours.message}
-          </p>
-        )}
+        {watch("startOfQuietHours") == undefined &&
+          watch("endOfQuietHours") != undefined && (
+            <p className="text-red-500 font-semibold">
+              Both start time and end time must be set together
+            </p>
+          )}
         <Select
-          onValueChange={(e: hoursType) => {
-            setValue("endOfQuietHours", e);
+          defaultValue={watch("endOfQuietHours")}
+          onValueChange={(e: hoursType | "No time set") => {
+            setValue("endOfQuietHours", e === "No time set" ? undefined : e);
           }}
         >
           <SelectTrigger className="w-[180px]">
@@ -183,6 +308,7 @@ export default function HouseRulesAndInformation(form: formProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
+              <SelectItem value="No time set">No time set</SelectItem>
               {Object.values(hours.Values).map((hour, index) => {
                 return (
                   <SelectItem key={index} value={hour}>
@@ -193,11 +319,12 @@ export default function HouseRulesAndInformation(form: formProps) {
             </SelectGroup>
           </SelectContent>
         </Select>
-        {errors.endOfQuietHours && (
-          <p className="text-red-500 font-semibold">
-            {errors.endOfQuietHours.message}
-          </p>
-        )}
+        {watch("startOfQuietHours") != undefined &&
+          watch("endOfQuietHours") == undefined && (
+            <p className="text-red-500 font-semibold">
+              Both start time and end time must be set together
+            </p>
+          )}
       </div>
       <div className="flex flex-col">
         <p className="font-semibold text-lg">Additional rules</p>
@@ -209,7 +336,15 @@ export default function HouseRulesAndInformation(form: formProps) {
           in detailing these additional rules.
         </p>
         <Textarea
-          {...register("additionalRules")}
+          {...register("additionalRules", {
+            setValueAs: (v) => (v === "" ? undefined : v),
+          })}
+          defaultValue={
+            defaultValues?.additionalRules &&
+            defaultValues?.additionalRules != undefined
+              ? defaultValues?.additionalRules
+              : ""
+          }
           placeholder="Guests are expected to respect their neighbors"
         />
         {errors.additionalRules && (
@@ -221,7 +356,18 @@ export default function HouseRulesAndInformation(form: formProps) {
       <div className="flex flex-col">
         <p className="font-semibold text-lg">House information</p>
         <p>Bla bla bla bla bla.</p>
-        <Textarea {...register("houseInformation")} placeholder="Bla la" />
+        <Textarea
+          defaultValue={
+            defaultValues?.houseInformation &&
+            defaultValues?.houseInformation != undefined
+              ? defaultValues?.houseInformation
+              : ""
+          }
+          {...register("houseInformation", {
+            setValueAs: (v) => (v === "" ? undefined : v),
+          })}
+          placeholder="Write the information here"
+        />
         {errors.houseInformation && (
           <p className="text-red-500 font-semibold">
             {errors.houseInformation.message}
@@ -239,7 +385,9 @@ export default function HouseRulesAndInformation(form: formProps) {
         >
           Back
         </Button>
-        {<Button type="submit">Next</Button>}
+        <Button type="submit" disabled={isSubmitting}>
+          Next
+        </Button>
       </div>
     </form>
   );

@@ -18,7 +18,7 @@ export default async function ManageHomes() {
     redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
   }
 
-  const hostHomes = await getAllHostHomes(supabase);
+  const hostHomes = await getAllHostHomes();
   console.log(hostHomes);
 
   if (hostHomes.length === 0) {

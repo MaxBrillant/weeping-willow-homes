@@ -1,4 +1,7 @@
-import { supabase } from "../../../utils/supabaseClient";
+"use server";
+
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 
 type returnedHomesTypes = Array<{
   id: number;
@@ -85,6 +88,8 @@ type filtersType = {
   sharedBathrooms: number | undefined;
 };
 export async function getListOfHomes(filters: filtersType, pageNumber: number) {
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore });
   let query = supabase
     .from("homes")
     .select(

@@ -17,7 +17,7 @@ export default async function ManageGuests() {
     redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
   }
 
-  const hostGuests = await getAllHostguests(supabase);
+  const hostGuests = await getAllHostguests();
 
   if (hostGuests.length === 0) {
     return (

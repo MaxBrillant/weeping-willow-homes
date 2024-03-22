@@ -10,7 +10,7 @@ export const PropertyFormSchema = z.object({
     .string()
     .min(30, "The description must have at least 30 characters")
     .max(500, "The description must have a maximum of 500 characters"),
-  size: z
+  propertySize: z
     .number({
       invalid_type_error: "Please write a valid size",
     })
@@ -45,8 +45,14 @@ export const AccommodationFormSchema = z.object({
 export const LocationFormSchema = z
   .object({
     city: z.enum(["Nairobi, Kenya", "Mombasa, Kenya"]),
-    streetAddress: z.string().min(20, "Write a complete address"),
-    buildingName: z.string(),
+    streetAddress: z
+      .string()
+      .min(15, "Write a complete address")
+      .max(100, "The address shouldn't have more than 100 characters"),
+    buildingName: z
+      .string()
+      .min(7, "The building name should have at least 7 characters")
+      .max(50, "The building shouldn't have more than 50 characters"),
     longitude: z.number(),
     latitude: z.number(),
   })
@@ -56,34 +62,35 @@ export const LocationFormSchema = z
   });
 
 export const PhotosFormSchema = z.object({
-  coverPhoto: z.string().url(),
+  coverPhoto: z
+    .string({ required_error: "Please select a cover photo" })
+    .url("Please select a cover photo"),
   sleepingSpacePhotos: z
-    .array(z.string().url())
+    .array(z.string())
     .min(2, "A minimum of 2 photos is required")
     .max(5, "You can only add a maximum of 5 photos"),
   livingSpacePhotos: z
-    .array(z.string().url())
+    .array(z.string())
     .min(2, "A minimum of 2 photos is required")
     .max(5, "You can only add a maximum of 5 photos"),
   bathroomPhotos: z
-    .array(z.string().url())
+    .array(z.string())
     .min(2, "A minimum of 2 photos is required")
     .max(5, "You can only add a maximum of 5 photos"),
   kitchenPhotos: z
-    .array(z.string().url())
+    .array(z.string())
     .min(2, "A minimum of 2 photos is required")
     .max(5, "You can only add a maximum of 5 photos"),
   buildingPhotos: z
-    .array(z.string().url())
+    .array(z.string())
     .min(1, "A minimum of 1 photo is required")
     .max(5, "You can only add a maximum of 5 photos"),
   outdoorsPhotos: z
-    .array(z.string().url())
+    .array(z.string())
     .min(1, "A minimum of 1 photo is required")
     .max(5, "You can only add a maximum of 5 photos"),
   additionalPhotos: z
     .array(z.string().url())
-    .min(0)
     .max(5, "You can only add a maximum of 5 photos"),
 });
 
@@ -104,16 +111,19 @@ export const FacilitiesAndFeaturesFormSchema = z.object({
 
 export const FeesAndFinancesFormSchema = z.object({
   currency: z.enum(["usd", "kes"]),
-  regularFees: z
+  monthlyFees: z
     .number({
       invalid_type_error: "Please write a valid amount",
     })
-    .nonnegative(),
+    .min(500, "The amount must be superior to 500")
+    .max(500000, "The amount must be inferior to 500000"),
   firstTimeFees: z
     .number({
       invalid_type_error: "Please write a valid amount",
     })
-    .nonnegative(),
+    .min(500, "The amount must be superior to 500")
+    .max(500000, "The amount must be inferior to 500000")
+    .optional(),
   firstTimeFeesDescription: z
     .string()
     .max(150, "The description must have a maximum of 150 characters")
@@ -147,21 +157,39 @@ export const hours = z.enum([
   "10:00 PM",
   "11:00 PM",
 ]);
-export const HouseRulesAndInformationFormSchema = z.object({
-  eventsAllowed: z.boolean().optional(),
-  petsAllowed: z.boolean().optional(),
-  smokingAllowed: z.boolean().optional(),
-  startOfQuietHours: hours.optional(),
-  endOfQuietHours: hours.optional(),
-  additionalRules: z
-    .string()
-    .max(300, "The additional rules must have a maximum of 300 characters")
-    .optional(),
-  houseInformation: z
-    .string()
-    .max(
-      300,
-      "The additional information must have a maximum of 300 characters"
-    )
-    .optional(),
-});
+export const HouseRulesAndInformationFormSchema = z
+  .object({
+    eventsAllowed: z.boolean().optional(),
+    petsAllowed: z.boolean().optional(),
+    smokingAllowed: z.boolean().optional(),
+    startOfQuietHours: hours.optional(),
+    endOfQuietHours: hours.optional(),
+    additionalRules: z
+      .string()
+      .max(300, "The additional rules must have a maximum of 300 characters")
+      .optional(),
+    houseInformation: z
+      .string()
+      .max(
+        300,
+        "The additional information must have a maximum of 300 characters"
+      )
+      .optional(),
+  })
+  .refine(
+    (data) => {
+      // If startOfQuietHours is set, endOfQuietHours must also be set
+      if (data.startOfQuietHours && !data.endOfQuietHours) {
+        return false;
+      }
+      // If endOfQuietHours is set, startOfQuietHours must also be set
+      if (data.endOfQuietHours && !data.startOfQuietHours) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Both start time and end time must be set together",
+      path: ["startOfQuietHours", "endOfQuietHours"],
+    }
+  );

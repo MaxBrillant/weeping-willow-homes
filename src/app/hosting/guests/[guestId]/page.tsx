@@ -25,7 +25,7 @@ export default async function GuestPage({
     redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
   }
 
-  const guestDetails = await getHostGuestsDetaills(supabase, stayId);
+  const guestDetails = await getHostGuestsDetaills(stayId);
 
   console.log(guestDetails);
 

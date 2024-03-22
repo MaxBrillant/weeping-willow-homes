@@ -1,11 +1,14 @@
-import { SupabaseClient } from "@supabase/supabase-js";
+"use server";
+
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 
 type returnedHostHomeDetailsType = Array<{
   id: number;
   title: string;
   description: string;
   type_of_property: "house" | "apartment";
-  property_size: number;
+  property_size: number | null;
   status: "in-progress" | "completed" | "verified";
   accommodation_information: {
     guests: number;
@@ -59,7 +62,7 @@ export type homeDetailsType = {
   id: number;
   title: string;
   description: string;
-  propertySize: number;
+  propertySize: number | null;
   city: "Nairobi, Kenya" | "Mombasa, Kenya";
   longitude: number;
   latitude: number;
@@ -91,10 +94,9 @@ export type homeDetailsType = {
   };
 };
 
-export default async function getHostHomeDetails(
-  supabase: SupabaseClient,
-  homeId: number
-) {
+export default async function getHostHomeDetails(homeId: number) {
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore });
   const userId = (await supabase.auth.getUser()).data.user?.id;
   const { data, error } = await supabase
     .from("homes")
