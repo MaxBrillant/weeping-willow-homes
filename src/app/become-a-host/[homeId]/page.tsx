@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import BackButton from "@/app/components/backButton";
 import { Progress } from "@/components/ui/progress";
 import HomeInformationForm from "@/app/homeForm/homeInformationForm";
@@ -12,6 +12,15 @@ import FacilitiesAndFeaturesForm from "@/app/homeForm/facilitiesAndFeaturesForm"
 import FeesForm from "@/app/homeForm/feesForm";
 import HouseRulesAndInformation from "@/app/homeForm/houseRulesAndInformationForm";
 import userIsAllowedToCreateHome from "@/api/defaultValues/checkAbilityToCreateHome";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function BecomeAHost({
   params,
@@ -20,12 +29,29 @@ export default function BecomeAHost({
 }) {
   const [step, setStep] = useState<number>(1);
   const { push } = useRouter();
+  const searchParams = useSearchParams();
+
+  const [isCompleted, setIsCompleted] = useState(false);
 
   const [hasAccess, setHasAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const handleSignedOutUserAndCheckForUserAccess = async () => {
     setIsLoading(true);
+
+    if (searchParams != undefined && searchParams) {
+      if (!isNaN(Number(searchParams.get("step")))) {
+        const selectedStep = searchParams.get("step");
+        if (Number(selectedStep) > 6) {
+          push("/become-a-host/" + params.homeId);
+        } else {
+          setStep(Number(selectedStep));
+        }
+      } else {
+        push("/become-a-host/" + params.homeId);
+      }
+    }
+
     const supabase = createClientComponentClient();
     const {
       data: { session },
@@ -214,7 +240,7 @@ export default function BecomeAHost({
                   () => scrollTo({ top: 10, behavior: "smooth" }),
                 ]}
                 submitFunctions={[
-                  // () => setStep(5),
+                  () => setIsCompleted(true),
                   () => scrollTo({ top: 10, behavior: "smooth" }),
                 ]}
                 homeId={params.homeId}
@@ -222,6 +248,25 @@ export default function BecomeAHost({
             </div>
           </div>
         )}
+        <Dialog open={isCompleted}>
+          <DialogContent className="sm:max-w-[425px] max-h-[500px] overflow-auto">
+            <div className="flex flex-col gap-5 p-5 items-center justify-center">
+              <p>Welcome on board</p>
+              <p>You have successfully completed the creation of this home.</p>
+              <p>{`What's next?`}</p>
+              <p>
+                {`We will get in touch with you via call or email, and initiate
+                the verification process of your home. We want to ensure a safe
+                and luxurious experience to your future guests, and that's why
+                your home will only be available for booking after being
+                verified by us.`}
+              </p>
+              <Link href={"/hosting"}>
+                <Button>Go to Hosting</Button>
+              </Link>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

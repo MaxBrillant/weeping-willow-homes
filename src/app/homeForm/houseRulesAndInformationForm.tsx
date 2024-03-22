@@ -375,18 +375,20 @@ export default function HouseRulesAndInformation(form: formProps) {
         )}
       </div>
       <div className="w-full flex flex-row gap-3 justify-end p-3">
-        <Button
-          variant={"outline"}
-          onClick={() =>
-            form.backFunctions.map((backFunction: () => void) => {
-              backFunction();
-            })
-          }
-        >
-          Back
-        </Button>
+        {form.backFunctions.length > 0 && (
+          <Button
+            variant={"outline"}
+            onClick={() =>
+              form.backFunctions.map((backFunction: () => void) => {
+                backFunction();
+              })
+            }
+          >
+            Back
+          </Button>
+        )}
         <Button type="submit" disabled={isSubmitting}>
-          Next
+          Save and continue
         </Button>
       </div>
     </form>

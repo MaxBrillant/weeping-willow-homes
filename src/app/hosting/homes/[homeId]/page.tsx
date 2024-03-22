@@ -7,6 +7,14 @@ import { cookies, headers } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import EditPopup from "@/app/components/editHomeDialog";
+import AccommodationForm from "@/app/homeForm/accommodationForm";
+import HomeInformationForm from "@/app/homeForm/homeInformationForm";
+import PhotosForm from "@/app/homeForm/photosForm";
+import FacilitiesAndFeaturesForm from "@/app/homeForm/facilitiesAndFeaturesForm";
+import FeesForm from "@/app/homeForm/feesForm";
+import LocationForm from "@/app/homeForm/locationForm";
+import HouseRulesAndInformation from "@/app/homeForm/houseRulesAndInformationForm";
 
 export default async function Home({ params }: { params: { homeId: number } }) {
   const homeId = params.homeId;
@@ -47,7 +55,15 @@ export default async function Home({ params }: { params: { homeId: number } }) {
         <div className="w-full flex flex-col gap-3 p-7 rounded-3xl bg-slate-200">
           <div className="flex flex-row justify-between items-center">
             <p className="font-semibold text-2xl">Property details</p>
-            <Button variant={"outline"}>Edit</Button>
+            <EditPopup
+              title="Property details"
+              form={
+                <HomeInformationForm
+                  submitFunctions={[]}
+                  homeId={params.homeId}
+                ></HomeInformationForm>
+              }
+            ></EditPopup>
           </div>
           <div className="flex flex-col gap-5 p-3">
             <div>
@@ -75,7 +91,16 @@ export default async function Home({ params }: { params: { homeId: number } }) {
         <div className="w-full flex flex-col gap-3 p-7 rounded-3xl bg-slate-200">
           <div className="flex flex-row justify-between items-center">
             <p className="font-semibold text-2xl">Accommodation</p>
-            <Button variant={"outline"}>Edit</Button>
+            <EditPopup
+              title="Accommodation"
+              form={
+                <AccommodationForm
+                  backFunctions={[]}
+                  submitFunctions={[]}
+                  homeId={params.homeId}
+                ></AccommodationForm>
+              }
+            ></EditPopup>
           </div>
           <div className="flex flex-col gap-5 p-3">
             <div>
@@ -100,7 +125,16 @@ export default async function Home({ params }: { params: { homeId: number } }) {
         <div className="w-full flex flex-col gap-3 p-7 rounded-3xl bg-slate-200">
           <div className="flex flex-row justify-between items-center">
             <p className="font-semibold text-2xl">Photos</p>
-            <Button variant={"outline"}>Edit</Button>
+            <EditPopup
+              title="Photos"
+              form={
+                <PhotosForm
+                  backFunctions={[]}
+                  submitFunctions={[]}
+                  homeId={params.homeId}
+                ></PhotosForm>
+              }
+            ></EditPopup>
           </div>
           <div className="flex flex-col gap-5 p-3">
             <div className="grid grid-cols-3 items-center gap-2">
@@ -126,8 +160,17 @@ export default async function Home({ params }: { params: { homeId: number } }) {
         </div>
         <div className="w-full flex flex-col gap-3 p-7 rounded-3xl bg-slate-200">
           <div className="flex flex-row justify-between items-center">
-            <p className="font-semibold text-2xl">Facilities and benefits</p>
-            <Button variant={"outline"}>Edit</Button>
+            <p className="font-semibold text-2xl">Facilities and features</p>
+            <EditPopup
+              title="Facilities and features"
+              form={
+                <FacilitiesAndFeaturesForm
+                  backFunctions={[]}
+                  submitFunctions={[]}
+                  homeId={params.homeId}
+                ></FacilitiesAndFeaturesForm>
+              }
+            ></EditPopup>
           </div>
           <div className="flex flex-col gap-5 p-3">
             <div className="flex flex-col gap-5 p-3">
@@ -150,8 +193,17 @@ export default async function Home({ params }: { params: { homeId: number } }) {
         </div>
         <div className="w-full flex flex-col gap-3 p-7 rounded-3xl bg-slate-200">
           <div className="flex flex-row justify-between items-center">
-            <p className="font-semibold text-2xl">Fees and finances</p>
-            <Button variant={"outline"}>Edit</Button>
+            <p className="font-semibold text-2xl">Fees information</p>
+            <EditPopup
+              title="Fees information"
+              form={
+                <FeesForm
+                  backFunctions={[]}
+                  submitFunctions={[]}
+                  homeId={params.homeId}
+                ></FeesForm>
+              }
+            ></EditPopup>
           </div>
           <div className="flex flex-col gap-5 p-3">
             <div>
@@ -197,7 +249,16 @@ export default async function Home({ params }: { params: { homeId: number } }) {
         <div className="w-full flex flex-col gap-3 p-7 rounded-3xl bg-slate-200">
           <div className="flex flex-row justify-between items-center">
             <p className="font-semibold text-2xl">Location</p>
-            <Button variant={"outline"}>Edit</Button>
+            <EditPopup
+              title="Location"
+              form={
+                <LocationForm
+                  backFunctions={[]}
+                  submitFunctions={[]}
+                  homeId={params.homeId}
+                ></LocationForm>
+              }
+            ></EditPopup>
           </div>
           <p>{hostHomeDetails.city}</p>
           <div className="flex flex-col gap-5 p-3 aspect-[4/3]">
@@ -216,7 +277,16 @@ export default async function Home({ params }: { params: { homeId: number } }) {
             <p className="font-semibold text-2xl">
               House rules and information
             </p>
-            <Button variant={"outline"}>Edit</Button>
+            <EditPopup
+              title="House rules and information"
+              form={
+                <HouseRulesAndInformation
+                  backFunctions={[]}
+                  submitFunctions={[]}
+                  homeId={params.homeId}
+                ></HouseRulesAndInformation>
+              }
+            ></EditPopup>
           </div>
           <div className="flex flex-col gap-5 p-3">
             <div>

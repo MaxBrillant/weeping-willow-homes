@@ -79,6 +79,8 @@ export async function addOrUpdateHouseRulesAndInformation(
         formData.houseRulesAndInformationId +
         " was successfully updated"
     );
+
+    completeSubmission(formData.homeId, supabase);
   }
 }
 
@@ -106,4 +108,59 @@ async function addHouseRulesAndInformationToHome(
       " was successfully added to the home of ID: " +
       homeId
   );
+
+  completeSubmission(homeId, supabase);
+}
+
+async function completeSubmission(homeId: number, supabase: SupabaseClient) {
+  type returnedHomeType = Array<{
+    id: number;
+    accommodation_id: number | null;
+    location_id: number | null;
+    photos_id: number | null;
+    home_facilities_and_features: Array<{ id: number }>;
+    fees_id: number | null;
+    house_rules_and_information_id: number | null;
+  }>;
+
+  const { data } = await supabase
+    .from("homes")
+    .select(
+      "id, " +
+        "accommodation_id, " +
+        "location_id, " +
+        "photos_id, " +
+        "home_facilities_and_features(id), " +
+        "fees_id, " +
+        "house_rules_and_information_id"
+    )
+    .eq("id", homeId)
+    .returns<returnedHomeType>();
+
+  if (data) {
+    if (
+      data[0].accommodation_id &&
+      data[0].location_id &&
+      data[0].photos_id &&
+      data[0].home_facilities_and_features.length > 0 &&
+      data[0].fees_id &&
+      data[0].house_rules_and_information_id
+    ) {
+      const { error } = await supabase
+        .from("homes")
+        .update({
+          status: "completed",
+        })
+        .eq("id", homeId);
+
+      if (error) {
+        console.log(
+          "Error while completing creation of home: " + error.message
+        );
+      }
+      console.log(
+        "Creation of home of ID: " + homeId + " was successfully completed"
+      );
+    }
+  }
 }
