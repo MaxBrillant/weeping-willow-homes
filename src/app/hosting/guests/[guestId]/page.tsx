@@ -1,3 +1,4 @@
+import UserHasProfile from "@/api/fetch/checkIfUserHasProfile";
 import getHostGuestsDetaills from "@/api/fetch/fetchHostGuestsDetails";
 import BackButton from "@/app/components/backButton";
 import { Button } from "@/components/ui/button";
@@ -20,9 +21,18 @@ export default async function GuestPage({
     data: { session },
   } = await supabase.auth.getSession();
 
+  const headersList = headers();
   if (!session) {
-    const headersList = headers();
     redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
+  } else {
+    const userHasProfile = await UserHasProfile();
+    if (!userHasProfile) {
+      redirect(
+        `/users/create-profile?redirect-to=${headersList
+          .get("x-pathname")
+          ?.replaceAll("&", "!")}`
+      );
+    }
   }
 
   const guestDetails = await getHostGuestsDetaills(stayId);

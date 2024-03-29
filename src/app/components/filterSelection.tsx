@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 import {
   Dialog,
@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dialog";
 import OptionContainer from "./optionContainer";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { FilterParamsSchema } from "@/validation/paramValidation";
 
 export default function FilterSelection() {
   const [open, setOpen] = useState(false);

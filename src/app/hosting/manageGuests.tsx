@@ -1,3 +1,4 @@
+import UserHasProfile from "@/api/fetch/checkIfUserHasProfile";
 import getAllHostguests from "@/api/fetch/fetchHostGuests";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies, headers } from "next/headers";
@@ -12,9 +13,18 @@ export default async function ManageGuests() {
     data: { session },
   } = await supabase.auth.getSession();
 
+  const headersList = headers();
   if (!session) {
-    const headersList = headers();
     redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
+  } else {
+    const userHasProfile = await UserHasProfile();
+    if (!userHasProfile) {
+      redirect(
+        `/users/create-profile?redirect-to=${headersList
+          .get("x-pathname")
+          ?.replaceAll("&", "!")}`
+      );
+    }
   }
 
   const hostGuests = await getAllHostguests();

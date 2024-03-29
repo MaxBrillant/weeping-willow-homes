@@ -12,15 +12,10 @@ import FacilitiesAndFeaturesForm from "@/app/homeForm/facilitiesAndFeaturesForm"
 import FeesForm from "@/app/homeForm/feesForm";
 import HouseRulesAndInformation from "@/app/homeForm/houseRulesAndInformationForm";
 import userIsAllowedToCreateHome from "@/api/defaultValues/checkAbilityToCreateHome";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import UserHasProfile from "@/api/fetch/checkIfUserHasProfile";
 
 export default function BecomeAHost({
   params,
@@ -59,6 +54,15 @@ export default function BecomeAHost({
 
     if (!session) {
       push(`/login?redirect-to=${location}`);
+    } else {
+      const userHasProfile = await UserHasProfile();
+      if (!userHasProfile) {
+        push(
+          `/users/create-profile?redirect-to=${location
+            .toString()
+            .replaceAll("&", "!")}`
+        );
+      }
     }
     const userHasAccess = await userIsAllowedToCreateHome(
       params.homeId as number

@@ -1,6 +1,15 @@
 import getUserProfile from "@/api/fetch/fetchUserProfile";
 import BackButton from "@/app/components/backButton";
+import EditPopup from "@/app/components/editHomeDialog";
+import ProfileForm from "@/app/profileForm/profileForm";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import Image from "next/image";
@@ -75,9 +84,10 @@ export default async function Profile({
             </p>
           )}
           {activeUserId && activeUserId === userProfile.userId && (
-            <Button variant={"outline"} className="mt-5">
-              Edit profile
-            </Button>
+            <EditPopup
+              title="Edit profile"
+              form={<ProfileForm submitFunctions={[]}></ProfileForm>}
+            ></EditPopup>
           )}
         </div>
       </div>

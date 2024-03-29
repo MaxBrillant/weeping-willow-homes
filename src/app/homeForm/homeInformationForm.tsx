@@ -97,7 +97,7 @@ export default function HomeInformationForm(form: formProps) {
         propertySize:
           formData.propertySize != undefined ? formData.propertySize : null,
       });
-      push("/become-a-host/" + homeId);
+      push("/become-a-host/" + homeId + "?step=1");
     } else {
       await createOrUpdateHome({
         id: defaultValues.id,
