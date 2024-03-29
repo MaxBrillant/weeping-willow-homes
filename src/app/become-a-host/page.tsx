@@ -5,6 +5,7 @@ import HomeInformationForm from "../homeForm/homeInformationForm";
 import { Progress } from "@/components/ui/progress";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
+import UserHasProfile from "@/api/fetch/checkIfUserHasProfile";
 
 export default function BecomeAHost() {
   const { push } = useRouter();
@@ -17,6 +18,15 @@ export default function BecomeAHost() {
 
     if (!session) {
       push(`/login?redirect-to=${location}`);
+    } else {
+      const userHasProfile = await UserHasProfile();
+      if (!userHasProfile) {
+        push(
+          `/users/create-profile?redirect-to=${location
+            .toString()
+            .replaceAll("&", "!")}`
+        );
+      }
     }
   };
 

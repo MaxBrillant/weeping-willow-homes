@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import BookingDetailsSelection from "./bookingDetailsSelection";
-import { BookingParamsSchema } from "@/validation/paramValidation";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +16,8 @@ import {
   Session,
   createClientComponentClient,
 } from "@supabase/auth-helpers-nextjs";
+import UserHasProfile from "@/api/fetch/checkIfUserHasProfile";
+import { BookingParamsSchema } from "@/validation/paramValidation";
 
 type ctaProps = {
   title: string;
@@ -136,8 +137,8 @@ function BookingPage(stay: {
   const { push } = useRouter();
   const searchParams = useSearchParams();
 
+  const supabase = createClientComponentClient();
   const getAuthSession = async () => {
-    const supabase = createClientComponentClient();
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -148,33 +149,43 @@ function BookingPage(stay: {
   getAuthSession().then((value) => {
     return (session = value);
   });
-  const handleSignedOutUser = async () => {
-    if (!session) {
-      const params = new URLSearchParams(searchParams);
-      params.delete("guests");
-      params.delete("start-date");
-      params.delete("duration");
 
-      if (stay.numberOfGuests != undefined) {
-        params.set("guests", stay.numberOfGuests.toString());
-      }
-      if (stay.date != undefined) {
-        let dateString =
-          stay.date.getFullYear() +
-          "-" +
-          (stay.date.getMonth() + 1) +
-          "-" +
-          stay.date.getDate();
-        params.set("start-date", dateString);
-      }
-      if (stay.duration != undefined) {
-        params.set("duration", stay.duration.toString());
-      }
+  const handleSignedOutUser = async () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete("guests");
+    params.delete("start-date");
+    params.delete("duration");
+
+    if (stay.numberOfGuests != undefined) {
+      params.set("guests", stay.numberOfGuests.toString());
+    }
+    if (stay.date != undefined) {
+      let dateString =
+        stay.date.getFullYear() +
+        "-" +
+        (stay.date.getMonth() + 1) +
+        "-" +
+        stay.date.getDate();
+      params.set("start-date", dateString);
+    }
+    if (stay.duration != undefined) {
+      params.set("duration", stay.duration.toString());
+    }
+    if (!session) {
       push(
         `/login?redirect-to=${location.protocol}//${location.host}${
           location.pathname
         }?${params.toString().replaceAll("&", "!")}`
       );
+    } else {
+      const userHasProfile = await UserHasProfile();
+      if (!userHasProfile) {
+        push(
+          `/users/create-profile?redirect-to=${location.protocol}//${
+            location.host
+          }${location.pathname}?${params.toString().replaceAll("&", "!")}`
+        );
+      }
     }
   };
 

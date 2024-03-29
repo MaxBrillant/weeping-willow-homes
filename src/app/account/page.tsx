@@ -6,6 +6,7 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { redirect } from "next/navigation";
 import { getUserBasicInfo } from "@/api/fetch/fetchUserProfile";
 import SignOutButton from "../components/signOutButton";
+import UserHasProfile from "@/api/fetch/checkIfUserHasProfile";
 
 export default async function Account() {
   const cookieStore = cookies();
@@ -14,9 +15,18 @@ export default async function Account() {
     data: { session },
   } = await supabase.auth.getSession();
 
+  const headersList = headers();
   if (!session) {
-    const headersList = headers();
     redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
+  } else {
+    const userHasProfile = await UserHasProfile();
+    if (!userHasProfile) {
+      redirect(
+        `/users/create-profile?redirect-to=${headersList
+          .get("x-pathname")
+          ?.replaceAll("&", "!")}`
+      );
+    }
   }
   if (session.user.id != undefined) {
     const basicInfo = await getUserBasicInfo(session.user.id);

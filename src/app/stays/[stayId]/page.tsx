@@ -1,3 +1,4 @@
+import UserHasProfile from "@/api/fetch/checkIfUserHasProfile";
 import getStayDetails from "@/api/fetch/fetchStayDetails";
 import BackButton from "@/app/components/backButton";
 import Map, { ExpandMap } from "@/app/components/map";
@@ -21,9 +22,18 @@ export default async function StayDetails({
     data: { session },
   } = await supabase.auth.getSession();
 
+  const headersList = headers();
   if (!session) {
-    const headersList = headers();
     redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
+  } else {
+    const userHasProfile = await UserHasProfile();
+    if (!userHasProfile) {
+      redirect(
+        `/users/create-profile?redirect-to=${headersList
+          .get("x-pathname")
+          ?.replaceAll("&", "!")}`
+      );
+    }
   }
 
   const stayDetails = await getStayDetails(stayId);

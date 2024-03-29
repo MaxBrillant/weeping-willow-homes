@@ -1,3 +1,4 @@
+import UserHasProfile from "@/api/fetch/checkIfUserHasProfile";
 import getAllHostHomes from "@/api/fetch/fetchHostHomes";
 import { Button } from "@/components/ui/button";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
@@ -13,9 +14,18 @@ export default async function ManageHomes() {
     data: { session },
   } = await supabase.auth.getSession();
 
+  const headersList = headers();
   if (!session) {
-    const headersList = headers();
     redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
+  } else {
+    const userHasProfile = await UserHasProfile();
+    if (!userHasProfile) {
+      redirect(
+        `/users/create-profile?redirect-to=${headersList
+          .get("x-pathname")
+          ?.replaceAll("&", "!")}`
+      );
+    }
   }
 
   const hostHomes = await getAllHostHomes();

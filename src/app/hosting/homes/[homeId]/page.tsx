@@ -15,6 +15,7 @@ import FacilitiesAndFeaturesForm from "@/app/homeForm/facilitiesAndFeaturesForm"
 import FeesForm from "@/app/homeForm/feesForm";
 import LocationForm from "@/app/homeForm/locationForm";
 import HouseRulesAndInformation from "@/app/homeForm/houseRulesAndInformationForm";
+import UserHasProfile from "@/api/fetch/checkIfUserHasProfile";
 
 export default async function Home({ params }: { params: { homeId: number } }) {
   const homeId = params.homeId;
@@ -25,9 +26,18 @@ export default async function Home({ params }: { params: { homeId: number } }) {
     data: { session },
   } = await supabase.auth.getSession();
 
+  const headersList = headers();
   if (!session) {
-    const headersList = headers();
     redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
+  } else {
+    const userHasProfile = await UserHasProfile();
+    if (!userHasProfile) {
+      redirect(
+        `/users/create-profile?redirect-to=${headersList
+          .get("x-pathname")
+          ?.replaceAll("&", "!")}`
+      );
+    }
   }
 
   const hostHomeDetails = await getHostHomeDetails(homeId);
