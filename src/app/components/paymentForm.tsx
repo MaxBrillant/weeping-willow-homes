@@ -2,35 +2,38 @@
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { PaystackButton } from "react-paystack";
+import axios from "axios";
 
-const PAYSTACK_PUBLIC_KEY = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY;
-const config = {
-  reference: new Date().getTime().toString(),
-  email: "ndashimax37@gmail.com",
-  amount: 2000,
-  publicKey: PAYSTACK_PUBLIC_KEY as string,
-  currency: "kes",
-  plan: "PLN_bf3rsvn1pocofuc",
-};
+const PAYSTACK_PUBLIC_KEY = process.env
+  .NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY as string;
 
 export default function PaymentForm() {
-  // you can call this function anything
-  const handlePaystackSuccessAction = (reference: string) => {
-    // Implementation for whatever you want to do with reference and after success call.
+  const handlePaystackSuccessAction = async (reference: string) => {
     console.log(reference);
+    // Create a plan
+    const plan = await createPlan();
+    if (plan) {
+      // Create a subscription using the plan code
+      const subscription = await createSubscription(
+        plan.data.plan_code,
+        "ndashimax37@gmail.com"
+      );
+      console.log(subscription);
+    }
   };
 
-  // you can call this function anything
   const handlePaystackCloseAction = () => {
-    // implementation for  whatever you want to do when the Paystack dialog closed.
     console.log("closed");
   };
 
   const componentProps = {
-    ...config,
     text: "Go to payment page",
     onSuccess: (reference: string) => handlePaystackSuccessAction(reference),
     onClose: handlePaystackCloseAction,
+    publicKey: PAYSTACK_PUBLIC_KEY, // Add your Paystack public key here
+    email: "ndashimax37@gmail.com", // Add the customer's email here
+    amount: 1, // Add the amount to be charged here
+    currency: "USD",
   };
 
   return (
@@ -38,4 +41,56 @@ export default function PaymentForm() {
       <PaystackButton {...componentProps} />
     </Button>
   );
+}
+
+async function createPlan() {
+  const planDetails = {
+    name: "Your Plan Name",
+    interval: "daily",
+    amount: 2000,
+    currency: "NGN",
+  };
+
+  try {
+    const response = await axios.post(
+      "https://api.paystack.co/plan",
+      planDetails,
+      {
+        headers: {
+          Authorization: `Bearer ${PAYSTACK_PUBLIC_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function createSubscription(planCode: string, customerEmail: string) {
+  const subscriptionDetails = {
+    customer: customerEmail,
+    plan: planCode,
+  };
+
+  try {
+    const response = await axios.post(
+      "https://api.paystack.co/subscription",
+      subscriptionDetails,
+      {
+        headers: {
+          Authorization: `Bearer ${PAYSTACK_PUBLIC_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
 }

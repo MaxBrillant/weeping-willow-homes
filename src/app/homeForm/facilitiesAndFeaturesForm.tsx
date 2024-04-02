@@ -9,6 +9,7 @@ import OptionContainer from "../components/optionContainer";
 import { Button } from "@/components/ui/button";
 import getFacilitiesAndFeaturesDefaultValues from "@/api/defaultValues/facilitiesAndFeaturesForm";
 import { addOrUpdateFacilitiesAndFeatures } from "@/api/mutations/facilitiesAndFeaturesMutations";
+import Image from "next/image";
 
 type schema = z.infer<typeof FacilitiesAndFeaturesFormSchema>;
 
@@ -207,7 +208,19 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
           property comfortable and attractive.
         </p>
         <OptionContainer
-          options={facilitiesList.map((facility) => facility.title)}
+          options={facilitiesList.map((facility) => (
+            <div className="flex flex-row gap-2">
+              <Image
+                src={facility.iconUrl}
+                height={25}
+                width={25}
+                alt={facility.title}
+                loading="lazy"
+                className="aspect-square object-cover"
+              />
+              <p>facility.title</p>
+            </div>
+          ))}
           multipleSelectionEnabled={true}
           selectedOptions={selectedFacilities}
           setSelectedOptions={setSelectedFacilities}

@@ -272,7 +272,8 @@ function BookingPage(stay: {
                 </div>
               </div>
             </div>
-            <PaymentForm />
+            {/* <PaymentForm /> */}
+            <p>Booking is closed for now.</p>
           </div>
         </div>
       </DialogContent>

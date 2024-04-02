@@ -1,7 +1,7 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, useState } from "react";
 
 type containerProps = {
-  options: Array<string> | Array<number>;
+  options: Array<string> | Array<number> | Array<ReactNode>;
   multipleSelectionEnabled: boolean;
   selectedOptions: Array<number>;
   setSelectedOptions: Dispatch<SetStateAction<number[]>>;
