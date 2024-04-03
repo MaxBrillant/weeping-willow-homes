@@ -221,14 +221,14 @@ export default async function Home({ params }: { params: { homeId: number } }) {
               <p>{hostHomeDetails.currency.toUpperCase()}</p>
             </div>
             <div>
-              <p className="font-medium text-lg">Monthly fee</p>
+              <p className="font-medium text-lg">Monthly Rental Fee</p>
               <p>
                 {hostHomeDetails.currency.toUpperCase()}{" "}
                 {hostHomeDetails.monthlyFee}
               </p>
             </div>
             <div>
-              <p className="font-medium text-lg">First-time fee</p>
+              <p className="font-medium text-lg">Initial Setup Fee</p>
               {hostHomeDetails.firstTimeFee ? (
                 <p>
                   {hostHomeDetails.currency.toUpperCase()}{" "}
@@ -239,7 +239,9 @@ export default async function Home({ params }: { params: { homeId: number } }) {
               )}
             </div>
             <div>
-              <p className="font-medium text-lg">First-time fee description</p>
+              <p className="font-medium text-lg">
+                Initial Setup Fee description
+              </p>
               {hostHomeDetails.firstTimeFeeDescription ? (
                 <p>{hostHomeDetails.firstTimeFeeDescription}</p>
               ) : (
@@ -275,6 +277,7 @@ export default async function Home({ params }: { params: { homeId: number } }) {
             <Map
               long={hostHomeDetails.longitude}
               lat={hostHomeDetails.latitude}
+              scrollToZoom={false}
             />
             <ExpandMap
               longitude={hostHomeDetails.longitude}

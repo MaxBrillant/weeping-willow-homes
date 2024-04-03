@@ -13,9 +13,10 @@ export default function NumberSelection(number: numberProps) {
   return (
     <div className="flex flex-row gap-3 items-center">
       <Button
-        variant={"outline"}
+        variant={"secondary"}
         disabled={value <= number.min}
         size={"icon"}
+        className="text-2xl font-medium rounded-full"
         onClick={(e) => {
           e.preventDefault();
           setValue(value - 1);
@@ -24,11 +25,12 @@ export default function NumberSelection(number: numberProps) {
       >
         -
       </Button>
-      <p>{number.value}</p>
+      <p className="text-lg font-medium p-1">{number.value}</p>
       <Button
-        variant={"outline"}
+        variant={"secondary"}
         disabled={value >= number.max}
         size={"icon"}
+        className="text-2xl font-medium rounded-full"
         onClick={(e) => {
           e.preventDefault();
           setValue(value + 1);

@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import getHomeInformationDefaultValues from "@/api/defaultValues/homeInformation";
 import { createOrUpdateHome } from "@/api/mutations/homeInformationMutations";
 import { useRouter } from "next/navigation";
+import { Separator } from "@/components/ui/separator";
 
 type schema = z.infer<typeof PropertyFormSchema>;
 
@@ -119,13 +120,12 @@ export default function HomeInformationForm(form: formProps) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-10 p-5"
-    >
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Title</p>
-        <p>Give a descriptive and catchy title that summarizes the property.</p>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7 p-7">
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Title</p>
+        <p className="font-normal text-sm">
+          Give a descriptive and catchy title that summarizes the property.
+        </p>
         <Input
           {...register("title")}
           defaultValue={defaultValues?.title}
@@ -142,9 +142,10 @@ export default function HomeInformationForm(form: formProps) {
           <p className="text-red-500 font-semibold">{errors.title.message}</p>
         )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Type of property</p>
-        <p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Type of property</p>
+        <p className="font-normal text-sm">
           {`Choose the option that best describes your property, whether it's a
           standalone house or an apartment within a building.`}
         </p>
@@ -153,6 +154,7 @@ export default function HomeInformationForm(form: formProps) {
           multipleSelectionEnabled={false}
           selectedOptions={selectedType}
           setSelectedOptions={setSelectedType}
+          minSelections={1}
           {...register("typeOfProperty")}
         />
         {errors.typeOfProperty && (
@@ -161,9 +163,10 @@ export default function HomeInformationForm(form: formProps) {
           </p>
         )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Description</p>
-        <p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Description</p>
+        <p className="font-normal text-sm">
           Provide a detailed description of the property, its unique features,
           and any special offerings.
         </p>
@@ -187,9 +190,12 @@ export default function HomeInformationForm(form: formProps) {
           </p>
         )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Property size (optional)</p>
-        <p>Help us understand how your property measures.</p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Property size (optional)</p>
+        <p className="font-normal text-sm">
+          Help us understand how your property measures.
+        </p>
         <Input
           type="number"
           {...register("propertySize", {

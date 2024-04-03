@@ -102,7 +102,11 @@ export default async function HomeDetails({
         <div className="w-full flex flex-col gap-3 p-7 rounded-3xl bg-slate-200">
           <p className="font-semibold text-2xl">Where to find this home</p>
           <div className="flex flex-col gap-0 w-full aspect-[4/3]">
-            <Map long={homeDetails.longitude} lat={homeDetails.latitude} />
+            <Map
+              long={homeDetails.longitude}
+              lat={homeDetails.latitude}
+              scrollToZoom={false}
+            />
             <ExpandMap
               longitude={homeDetails.longitude}
               latitude={homeDetails.latitude}

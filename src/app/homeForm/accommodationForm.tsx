@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import NumberSelection from "../components/numberSelection";
 import getAccommodationInformationDefaultValues from "@/api/defaultValues/accommodationInformation";
 import { addOrUpdateAccommodationInformation } from "@/api/mutations/accomodationInformationMutations";
+import { Separator } from "@/components/ui/separator";
 
 type schema = z.infer<typeof AccommodationFormSchema>;
 
@@ -128,13 +129,10 @@ export default function AccommodationForm(form: formProps) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-10 p-5"
-    >
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Number of guests</p>
-        <p>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7 p-7">
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Number of guests</p>
+        <p className="font-normal text-sm">
           Specify the maximum number of guests or guests your accommodation can
           comfortably accommodate.
         </p>
@@ -150,9 +148,10 @@ export default function AccommodationForm(form: formProps) {
           </p>
         )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Number of bedrooms</p>
-        <p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Number of bedrooms</p>
+        <p className="font-normal text-sm">
           Indicate the total number of separate bedrooms available within your
           accommodation. Bedrooms are private sleeping spaces.
         </p>
@@ -168,9 +167,10 @@ export default function AccommodationForm(form: formProps) {
           </p>
         )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Number of beds</p>
-        <p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Number of beds</p>
+        <p className="font-normal text-sm">
           Specify the total number of beds within the accommodation. This
           includes all types of beds, such as single beds, double beds, and sofa
           beds.
@@ -187,14 +187,15 @@ export default function AccommodationForm(form: formProps) {
           </p>
         )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Number of bathrooms</p>
-        <p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Number of bathrooms</p>
+        <p className="font-normal text-sm">
           Specify the total count of bathrooms available in your accommodation.
           This includes any private and shared bathrooms.
         </p>
-        <div className="w-fit flex flex-col items-center p-3">
-          <p>Private bathrooms</p>
+        <div className="w-fit flex flex-col items-center p-3 gap-2 border border-b-slate-300 rounded-xl">
+          <p className="font-medium">Private bathrooms</p>
           <NumberSelection
             value={numberOfPrivateBathrooms}
             min={0}
@@ -207,8 +208,8 @@ export default function AccommodationForm(form: formProps) {
             </p>
           )}
         </div>
-        <div className="w-fit flex flex-col items-center p-3">
-          <p>Shared bathrooms</p>
+        <div className="w-fit flex flex-col items-center p-3 gap-2 border border-b-slate-300 rounded-xl">
+          <p className="font-medium">Shared bathrooms</p>
           <NumberSelection
             value={numberOfSharedBathrooms}
             min={1}

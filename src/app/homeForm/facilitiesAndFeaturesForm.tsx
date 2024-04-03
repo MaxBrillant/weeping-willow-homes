@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import getFacilitiesAndFeaturesDefaultValues from "@/api/defaultValues/facilitiesAndFeaturesForm";
 import { addOrUpdateFacilitiesAndFeatures } from "@/api/mutations/facilitiesAndFeaturesMutations";
 import Image from "next/image";
+import { Separator } from "@/components/ui/separator";
 
 type schema = z.infer<typeof FacilitiesAndFeaturesFormSchema>;
 
@@ -138,6 +139,8 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
         (index) => facilitiesList[index].id
       );
       setValue("facilities", selectedIds);
+    } else {
+      setValue("facilities", []);
     }
   }, [selectedFacilities]);
 
@@ -147,6 +150,8 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
         (index) => safetyFacilitiesList[index].id
       );
       setValue("safetyAndSecurity", selectedIds);
+    } else {
+      setValue("safetyAndSecurity", []);
     }
   }, [selectedSafetyFacilities]);
 
@@ -156,6 +161,8 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
         (index) => featuresList[index].id
       );
       setValue("features", selectedIds);
+    } else {
+      setValue("features", []);
     }
   }, [selectedFeatures]);
 
@@ -196,20 +203,17 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-10 p-5"
-    >
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Facilities</p>
-        <p>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7 p-7">
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Facilities</p>
+        <p className="font-normal text-sm">
           Highlight the facilities and benefits that guests will enjoy during
           their stay. Those are the conveniences and features that make your
           property comfortable and attractive.
         </p>
         <OptionContainer
           options={facilitiesList.map((facility) => (
-            <div className="flex flex-row gap-2">
+            <div key={facility.id} className="flex flex-row gap-2 items-center">
               <Image
                 src={facility.iconUrl}
                 height={25}
@@ -218,7 +222,7 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
                 loading="lazy"
                 className="aspect-square object-cover"
               />
-              <p>facility.title</p>
+              <p className="text-left">{facility.title}</p>
             </div>
           ))}
           multipleSelectionEnabled={true}
@@ -231,15 +235,28 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
           </p>
         )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Safety Facilities</p>
-        <p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Safety Facilities</p>
+        <p className="font-normal text-sm">
           The safety and security of your guests are paramount. In this section,
           detail the safety measures and features that provide peace of mind
           during their stay.
         </p>
         <OptionContainer
-          options={safetyFacilitiesList.map((facility) => facility.title)}
+          options={safetyFacilitiesList.map((facility) => (
+            <div key={facility.id} className="flex flex-row gap-2 items-center">
+              <Image
+                src={facility.iconUrl}
+                height={25}
+                width={25}
+                alt={facility.title}
+                loading="lazy"
+                className="aspect-square object-cover"
+              />
+              <p className="text-left">{facility.title}</p>
+            </div>
+          ))}
           multipleSelectionEnabled={true}
           selectedOptions={selectedSafetyFacilities}
           setSelectedOptions={setSelectedSafetyFacilities}
@@ -250,14 +267,27 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
           </p>
         )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Features</p>
-        <p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Features</p>
+        <p className="font-normal text-sm">
           Highlight two unique characteristics and qualities that make your
           accommodation special.
         </p>
         <OptionContainer
-          options={featuresList.map((feature) => feature.title)}
+          options={featuresList.map((feature) => (
+            <div key={feature.id} className="flex flex-row gap-2 items-center">
+              <Image
+                src={feature.iconUrl}
+                height={25}
+                width={25}
+                alt={feature.title}
+                loading="lazy"
+                className="aspect-square object-cover"
+              />
+              <p className="text-left">{feature.title}</p>
+            </div>
+          ))}
           multipleSelectionEnabled={true}
           selectedOptions={selectedFeatures}
           setSelectedOptions={setSelectedFeatures}

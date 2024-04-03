@@ -5,31 +5,38 @@ type containerProps = {
   multipleSelectionEnabled: boolean;
   selectedOptions: Array<number>;
   setSelectedOptions: Dispatch<SetStateAction<number[]>>;
+  minSelections?: number;
 };
 export default function OptionContainer(container: containerProps) {
   const [selectedOptions, setSelectedOptions] = useState(
     container.selectedOptions
   );
   return (
-    <div className="flex flex-row flex-wrap gap-2">
+    <div className="flex flex-row flex-wrap gap-2 py-3">
       {container.options.map((option, index) =>
         selectedOptions.includes(index) ? (
           <button
             key={index}
             onClick={(e) => {
               e.preventDefault();
-              setSelectedOptions((currentlySelectedOptions) =>
-                currentlySelectedOptions.filter(
-                  (selectedOption) => selectedOption !== index
-                )
-              );
-              container.setSelectedOptions((currentlySelectedOptions) =>
-                currentlySelectedOptions.filter(
-                  (selectedOption) => selectedOption !== index
-                )
-              );
+              if (
+                (container.minSelections != undefined &&
+                  selectedOptions.length > container.minSelections) ||
+                container.minSelections == undefined
+              ) {
+                setSelectedOptions((currentlySelectedOptions) =>
+                  currentlySelectedOptions.filter(
+                    (selectedOption) => selectedOption !== index
+                  )
+                );
+                container.setSelectedOptions((currentlySelectedOptions) =>
+                  currentlySelectedOptions.filter(
+                    (selectedOption) => selectedOption !== index
+                  )
+                );
+              }
             }}
-            className="py-1 px-2 min-w-10 min-h-10 h-fit bg-gray-300 border-4 font-semibold border-gray-700 rounded-lg"
+            className="py-1 px-2 min-w-10 min-h-10 h-fit bg-gray-300 font-medium border border-black rounded-lg"
           >
             <p>{option}</p>
           </button>
@@ -49,7 +56,7 @@ export default function OptionContainer(container: containerProps) {
                 [...currentlySelectedOptions, index].sort((a, b) => a - b)
               );
             }}
-            className="py-1 px-2 min-w-10 min-h-10 h-fit border border-black rounded-lg"
+            className="py-1 px-2 min-w-10 min-h-10 h-fit border border-slate-400 rounded-lg"
           >
             <p>{option}</p>
           </button>

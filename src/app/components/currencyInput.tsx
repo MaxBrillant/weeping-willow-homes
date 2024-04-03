@@ -60,6 +60,7 @@ const CurrencyInput = React.forwardRef<HTMLInputElement, InputProps>(
         type="text"
         className="p-1 pl-2 pr-2 min-w-1 w-10 box-content text-4xl font-semibold outline-transparent focus:underline"
         placeholder="0"
+        maxLength={6}
       />
     );
   }

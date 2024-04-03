@@ -102,18 +102,22 @@ export default function ProfileForm(form: formProps) {
   }, [form]);
 
   useEffect(() => {
-    setValue(
-      "languages",
-      selectedLanguages.map((language) => {
-        if (language === 0) {
-          return "English";
-        } else if (language === 1) {
-          return "Swahili";
-        } else {
-          return "French";
-        }
-      })
-    );
+    if (selectedLanguages.length > 0) {
+      setValue(
+        "languages",
+        selectedLanguages.map((language) => {
+          if (language === 0) {
+            return "English";
+          } else if (language === 1) {
+            return "Swahili";
+          } else {
+            return "French";
+          }
+        })
+      );
+    } else {
+      setValue("languages", []);
+    }
   }, [selectedLanguages]);
 
   useEffect(() => {

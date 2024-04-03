@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import getHouseRulesAndInformationDefaultValues from "@/api/defaultValues/houseRulesAndInformationForm";
 import { addOrUpdateHouseRulesAndInformation } from "@/api/mutations/houseRulesAndInformationMutations";
+import { Separator } from "@/components/ui/separator";
 
 type schema = z.infer<typeof HouseRulesAndInformationFormSchema>;
 type hoursType = z.infer<typeof hours>;
@@ -201,14 +202,11 @@ export default function HouseRulesAndInformation(form: formProps) {
     return <p>Loading...</p>;
   }
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-10 p-5"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7 p-7">
       <div className="flex flex-row gap-2">
-        <div className="w-[70%]">
-          <p className="font-semibold text-lg">Are events / parties allowed?</p>
-          <p>
+        <div className="w-full space-y-3">
+          <p className="font-bold text-lg">Are events / parties allowed?</p>
+          <p className="font-normal text-sm">
             Specify whether guests are allowed to host events or parties in your
             property.
           </p>
@@ -218,17 +216,20 @@ export default function HouseRulesAndInformation(form: formProps) {
             </p>
           )}
         </div>
-        <OptionContainer
-          options={["Yes", "No"]}
-          multipleSelectionEnabled={false}
-          selectedOptions={selectedOptionForEvents}
-          setSelectedOptions={setSelectedOptionForEvents}
-        />
+        <div className="flex w-40 justify-center">
+          <OptionContainer
+            options={["Yes", "No"]}
+            multipleSelectionEnabled={false}
+            selectedOptions={selectedOptionForEvents}
+            setSelectedOptions={setSelectedOptionForEvents}
+          />
+        </div>
       </div>
+      <Separator />
       <div className="flex flex-row gap-2">
-        <div className="w-[70%]">
-          <p className="font-semibold text-lg">Are pets allowed?</p>
-          <p>
+        <div className="w-full space-y-3">
+          <p className="font-bold text-lg">Are pets allowed?</p>
+          <p className="font-normal text-sm">
             Indicate whether guests are allowed to bring pets with them during
             their stay.
           </p>
@@ -238,87 +239,106 @@ export default function HouseRulesAndInformation(form: formProps) {
             </p>
           )}
         </div>
-        <OptionContainer
-          options={["Yes", "No"]}
-          multipleSelectionEnabled={false}
-          selectedOptions={selectedOptionForPets}
-          setSelectedOptions={setSelectedOptionForPets}
-        />
+
+        <div className="flex w-40 justify-center">
+          <OptionContainer
+            options={["Yes", "No"]}
+            multipleSelectionEnabled={false}
+            selectedOptions={selectedOptionForPets}
+            setSelectedOptions={setSelectedOptionForPets}
+          />
+        </div>
       </div>
+      <Separator />
       <div className="flex flex-row gap-2">
-        <div className="w-[70%]">
-          <p className="font-semibold text-lg">Is smoking allowed?</p>
-          <p>Clarify whether smoking is allowed within the accommodation.</p>
+        <div className="w-full space-y-3">
+          <p className="font-bold text-lg">Is smoking allowed?</p>
+          <p className="font-normal text-sm">
+            Clarify whether smoking is allowed within the accommodation.
+          </p>
           {errors.smokingAllowed && (
             <p className="text-red-500 font-semibold">
               {errors.smokingAllowed.message}
             </p>
           )}
         </div>
-        <OptionContainer
-          options={["Yes", "No"]}
-          multipleSelectionEnabled={false}
-          selectedOptions={selectedOptionForSmoking}
-          setSelectedOptions={setSelectedOptionForSmoking}
-        />
+        <div className="flex w-40 justify-center">
+          <OptionContainer
+            options={["Yes", "No"]}
+            multipleSelectionEnabled={false}
+            selectedOptions={selectedOptionForSmoking}
+            setSelectedOptions={setSelectedOptionForSmoking}
+          />
+        </div>
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Quiet Hours</p>
-        <p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Quiet Hours</p>
+        <p className="font-normal text-sm">
           Define the specific time during which guests are expected to maintain
           quiet and refrain from loud activities. This ensures a peaceful
           environment for all guests.
         </p>
-        <Select
-          defaultValue={watch("startOfQuietHours")}
-          onValueChange={(e: hoursType | "No time set") => {
-            setValue("startOfQuietHours", e === "No time set" ? undefined : e);
-          }}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select start time" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="No time set">No time set</SelectItem>
-              {Object.values(hours.Values).map((hour, index) => {
-                return (
-                  <SelectItem key={index} value={hour}>
-                    {hour}
-                  </SelectItem>
-                );
-              })}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+        <div className="flex flex-row gap-2 items-center">
+          <p>From:</p>
+          <Select
+            defaultValue={watch("startOfQuietHours")}
+            onValueChange={(e: hoursType | "No time set") => {
+              setValue(
+                "startOfQuietHours",
+                e === "No time set" ? undefined : e
+              );
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select start time" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="No time set">No time set</SelectItem>
+                {Object.values(hours.Values).map((hour, index) => {
+                  return (
+                    <SelectItem key={index} value={hour}>
+                      {hour}
+                    </SelectItem>
+                  );
+                })}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
         {watch("startOfQuietHours") == undefined &&
           watch("endOfQuietHours") != undefined && (
             <p className="text-red-500 font-semibold">
               Both start time and end time must be set together
             </p>
           )}
-        <Select
-          defaultValue={watch("endOfQuietHours")}
-          onValueChange={(e: hoursType | "No time set") => {
-            setValue("endOfQuietHours", e === "No time set" ? undefined : e);
-          }}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select end time" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="No time set">No time set</SelectItem>
-              {Object.values(hours.Values).map((hour, index) => {
-                return (
-                  <SelectItem key={index} value={hour}>
-                    {hour}
-                  </SelectItem>
-                );
-              })}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+
+        <div className="flex flex-row gap-2 items-center">
+          <p>To:</p>
+          <Select
+            defaultValue={watch("endOfQuietHours")}
+            onValueChange={(e: hoursType | "No time set") => {
+              setValue("endOfQuietHours", e === "No time set" ? undefined : e);
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select end time" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="No time set">No time set</SelectItem>
+                {Object.values(hours.Values).map((hour, index) => {
+                  return (
+                    <SelectItem key={index} value={hour}>
+                      {hour}
+                    </SelectItem>
+                  );
+                })}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
         {watch("startOfQuietHours") != undefined &&
           watch("endOfQuietHours") == undefined && (
             <p className="text-red-500 font-semibold">
@@ -326,9 +346,10 @@ export default function HouseRulesAndInformation(form: formProps) {
             </p>
           )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Additional rules</p>
-        <p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Additional rules</p>
+        <p className="font-normal text-sm">
           Use this section to outline any other rules or regulations that guests
           must adhere to during their stay. This can include rules related to
           maximum occupancy, specific behavior expectations, or any unique
@@ -353,9 +374,12 @@ export default function HouseRulesAndInformation(form: formProps) {
           </p>
         )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">House information</p>
-        <p>Bla bla bla bla bla.</p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">House information</p>
+        <p className="font-normal text-sm">
+          {`Use this section to  offer valuable information such as Wi-Fi passwords or other essential details to facilitate a comfortable stay for guests. This information will be accessible exclusively to guests following their booking.`}
+        </p>
         <Textarea
           defaultValue={
             defaultValues?.houseInformation &&
@@ -366,7 +390,7 @@ export default function HouseRulesAndInformation(form: formProps) {
           {...register("houseInformation", {
             setValueAs: (v) => (v === "" ? undefined : v),
           })}
-          placeholder="Write the information here"
+          placeholder="Wi-Fi password is 1234"
         />
         {errors.houseInformation && (
           <p className="text-red-500 font-semibold">

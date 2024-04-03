@@ -10,12 +10,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import { PhotosFormSchema } from "@/validation/newHomeValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import MoreIcon from "../../icons/search.svg";
 
 type schema = z.infer<typeof PhotosFormSchema>;
 
@@ -230,16 +232,13 @@ export default function PhotosForm(form: formProps) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-10 p-5"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7 p-7">
       {photoCategories.map((category, index) => {
         return (
-          <div key={index} className="flex flex-col">
-            <p className="font-semibold text-lg">{category.title}</p>
-            <p>{category.description}</p>
-            <div className="flex flex-wrap gap-2">
+          <div key={index} className="flex flex-col gap-3">
+            <p className="font-bold text-lg">{category.title}</p>
+            <p className="font-normal text-sm">{category.description}</p>
+            <div className="grid grid-cols-4 gap-2 items-center">
               {watch(category.validationString)?.map((photo, index) => {
                 return (
                   <div key={index} id={String(index)} className="relative">
@@ -249,17 +248,13 @@ export default function PhotosForm(form: formProps) {
                       width={100}
                       alt="photo"
                       loading="lazy"
-                      className="aspect-square object-cover border border-black rounded-xl"
+                      className="aspect-square object-cover rounded-xl"
                     />
                     <DropdownMenu>
                       <DropdownMenuTrigger className="absolute top-1 right-1 ">
-                        <Button
-                          variant={"secondary"}
-                          size={"icon"}
-                          className="w-6 h-6 opacity-90 rounded-full"
-                        >
-                          ...
-                        </Button>
+                        <button className="flex flex-col items-center justify-center bg-white opacity-90 rounded-full">
+                          <MoreIcon className="w-4 h-4 m-1 items-center" />
+                        </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                         {index > 0 && (
@@ -305,6 +300,7 @@ export default function PhotosForm(form: formProps) {
                         )}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
+                          className="focus:bg-red-400 focus:font-semibold"
                           onClick={(e) => {
                             watch("coverPhoto") === photo &&
                               setValue("coverPhoto", "");
@@ -355,12 +351,10 @@ export default function PhotosForm(form: formProps) {
                     const filePaths = Array.from(e.target.files).map((file) =>
                       URL.createObjectURL(file)
                     );
-                    watch(category.validationString) != undefined
-                      ? setValue(category.validationString, [
-                          ...(watch(category.validationString) as string[]),
-                          ...filePaths,
-                        ])
-                      : setValue(category.validationString, [...filePaths]);
+                    setValue(category.validationString, [
+                      ...(watch(category.validationString) as string[]),
+                      ...filePaths,
+                    ]);
 
                     const files = Array.from(e.target.files).map(
                       (file) => file
@@ -372,8 +366,21 @@ export default function PhotosForm(form: formProps) {
                 }}
               />
               <Button
-                variant={"secondary"}
-                className=" border-2 border-black border-dashed font-bold text-3xl w-[100px] h-[100px]"
+                variant={
+                  watch(category.validationString)?.length > 0
+                    ? "secondary"
+                    : "default"
+                }
+                size={
+                  watch(category.validationString)?.length > 0
+                    ? "icon"
+                    : "default"
+                }
+                className={
+                  watch(category.validationString)?.length > 0
+                    ? "border border-black font-light text-5xl w-20 h-20"
+                    : "w-fit"
+                }
                 disabled={
                   watch(category.validationString)?.length >= category.max
                 }
@@ -384,7 +391,11 @@ export default function PhotosForm(form: formProps) {
                   }
                 }}
               >
-                +
+                {watch(category.validationString)?.length > 0 ? (
+                  <p>+</p>
+                ) : (
+                  <p>Add photos</p>
+                )}
               </Button>
             </div>
             <p>
@@ -432,6 +443,9 @@ export default function PhotosForm(form: formProps) {
                   {errors.additionalPhotos.message}
                 </p>
               )}
+            {index < photoCategories.length - 1 && (
+              <Separator className="mt-7" />
+            )}
           </div>
         );
       })}

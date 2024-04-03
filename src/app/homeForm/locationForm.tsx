@@ -13,6 +13,7 @@ import Map from "../components/map";
 import { setKey, fromAddress, fromLatLng } from "react-geocode";
 import getLocationInformationDefaultValues from "@/api/defaultValues/locationForm";
 import { addOrUpdateLocationInformation } from "@/api/mutations/locationMutations";
+import { Separator } from "@/components/ui/separator";
 
 const GOOGLE_MAPS_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
 
@@ -176,33 +177,23 @@ export default function LocationForm(form: formProps) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-10 p-5"
-    >
-      <Button
-        variant={"outline"}
-        onClick={(e) => {
-          e.preventDefault();
-          getUserLocation();
-        }}
-      >
-        Use your current location
-      </Button>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">City</p>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7 p-7">
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">City / Town</p>
         <OptionContainer
           options={["Nairobi", "Mombasa"]}
           multipleSelectionEnabled={false}
           selectedOptions={selectedCity}
           setSelectedOptions={setSelectedCity}
+          minSelections={1}
         />
         {errors.city && (
           <p className="text-red-500 font-semibold">{errors.city.message}</p>
         )}
       </div>
-      <div>
-        <p className="font-semibold text-lg">Street address</p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Street address</p>
         <Autocomplete
           ref={liveAddressRef}
           apiKey={GOOGLE_MAPS_KEY as string}
@@ -219,21 +210,38 @@ export default function LocationForm(form: formProps) {
             setValue("streetAddress", place.formatted_address);
           }}
           onChange={() => {
+            setValue("streetAddress", "");
             isMapVisible && setIsMapVisible(false);
             coordinates[0] !== 0 &&
               coordinates[1] !== 0 &&
               setCoordinates([0, 0]);
           }}
           defaultValue={defaultValues?.streetAddress}
+          className={
+            "flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
+          }
         />
+        {watch("streetAddress") === "" &&
+          liveAddressRef.current?.value === "" && (
+            <Button
+              variant={"outline"}
+              onClick={(e) => {
+                e.preventDefault();
+                getUserLocation();
+              }}
+            >
+              Use your current location
+            </Button>
+          )}
         {errors.streetAddress && (
           <p className="text-red-500 font-semibold">
             {errors.streetAddress.message}
           </p>
         )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Building name</p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Building name</p>
         <Input
           {...register("buildingName")}
           placeholder="Luxurious 4 bedroom apartment"
@@ -263,8 +271,8 @@ export default function LocationForm(form: formProps) {
       )}
       {!isMapVisible && <Button type="submit">See map</Button>}
       {isMapVisible && (
-        <div>
-          <p className="font-semibold text-lg">Location on the map</p>
+        <div className="flex flex-col gap-3 p-5 bg-slate-200 rounded-2xl">
+          <p className="font-bold text-lg">Location on the map</p>
           {isAdjustingMap ? (
             <div className="relative">
               <div className="flex flex-col w-full aspect-[4/3]">
@@ -289,7 +297,11 @@ export default function LocationForm(form: formProps) {
           ) : (
             <div className="relative">
               <div className="flex flex-col w-full aspect-[4/3]">
-                <Map long={coordinates[0]} lat={coordinates[1]} />
+                <Map
+                  long={coordinates[0]}
+                  lat={coordinates[1]}
+                  scrollToZoom={false}
+                />
               </div>
               <Button
                 variant={"secondary"}

@@ -23,6 +23,7 @@ export default function LocationSelection(location: mapProps) {
         style: "mapbox://styles/mapbox/dark-v11",
         center: [location.long, location.lat],
         zoom: 15,
+        optimizeForTerrain: true,
       });
 
       // Add a draggable marker

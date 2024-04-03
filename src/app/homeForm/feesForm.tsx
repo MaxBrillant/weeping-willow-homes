@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { CurrencyInput } from "../components/currencyInput";
 import getFeesDefaultValues from "@/api/defaultValues/feesForm";
 import { addOrUpdateFeesInformation } from "@/api/mutations/feesFormMutations";
+import { Separator } from "@/components/ui/separator";
 
 type schema = z.infer<typeof FeesAndFinancesFormSchema>;
 
@@ -149,18 +150,18 @@ export default function FeesForm(form: formProps) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-10 p-5"
-    >
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Currency</p>
-        <p>Select the currency in which you are charging the rental fees.</p>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7 p-7">
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Currency</p>
+        <p className="font-normal text-sm">
+          Select the currency in which you are charging the rental fees.
+        </p>
         <OptionContainer
           options={["US Dollars", "Kenyan Shillings"]}
           multipleSelectionEnabled={false}
           selectedOptions={selectedCurrency}
           setSelectedOptions={setSelectedCurrency}
+          minSelections={1}
         />
         {errors.currency && (
           <p className="text-red-500 font-semibold">
@@ -168,11 +169,14 @@ export default function FeesForm(form: formProps) {
           </p>
         )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Regular fees</p>
-        <p>Set the standard rental rates for your accommodation.</p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Monthly Rental Fee</p>
+        <p className="font-normal text-sm">
+          Set the standard rental rates for your accommodation.
+        </p>
         <div className="flex flex-row gap-2 w-fit mx-auto my-7 p-2 bg-slate-300 items-center rounded-2xl ">
-          <p className="font-medium text-xl">Monthly</p>
+          <p className="font-semibold text-lg">Monthly</p>
           <button
             className="flex flex-row items-center p-1 px-3 gap-1 bg-white rounded-xl"
             onClick={(e) => {
@@ -201,9 +205,10 @@ export default function FeesForm(form: formProps) {
           </p>
         )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">First-time fees</p>
-        <p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Initial Setup Fee</p>
+        <p className="font-normal text-sm">
           Outline the initial costs associated with booking your property. This
           includes any upfront fees such as a deposit, cleaning fee, or any
           other one-time charges that guests need to pay when they book your
@@ -242,7 +247,9 @@ export default function FeesForm(form: formProps) {
             {errors.firstTimeFees.message}
           </p>
         )}
-        <p>Description (optional)</p>
+        <p className="font-bold text-lg">
+          Description of the Initial Setup Fee (optional)
+        </p>
         <Textarea
           {...register("firstTimeFeesDescription", {
             setValueAs: (v) => (v === "" ? undefined : v),
@@ -260,9 +267,10 @@ export default function FeesForm(form: formProps) {
           </p>
         )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Booking option</p>
-        <p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Booking option</p>
+        <p className="font-normal text-sm">
           {`Define how guests can book your property. This includes options such
           as "Instant Book," which allows guests to reserve the property without
           host approval, or "Approve or Decline Booking Requests," which means
@@ -273,6 +281,7 @@ export default function FeesForm(form: formProps) {
           multipleSelectionEnabled={false}
           selectedOptions={selectedBookingOption}
           setSelectedOptions={setSelectedBookingOption}
+          minSelections={1}
         />
         {errors.bookingOption && (
           <p className="text-red-500 font-semibold">
