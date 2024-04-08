@@ -277,7 +277,7 @@ export default function PhotosForm(form: formProps) {
                     />
                     <DropdownMenu>
                       <DropdownMenuTrigger className="absolute top-1 right-1 ">
-                        <button className="flex flex-col p-1 items-center justify-center bg-white opacity-90 rounded-full">
+                        <button className="flex flex-col p-1 items-center justify-center bg-white opacity-90 rounded-full border border-slate-500">
                           <FiMoreVertical className="w-4 h-4 items-center" />
                         </button>
                       </DropdownMenuTrigger>
@@ -379,26 +379,20 @@ export default function PhotosForm(form: formProps) {
                       }
                     );
 
-                    if (acceptedFiles.length > 0) {
-                      console.log(watch(category.validationString));
-                      const filePaths = acceptedFiles.map((file) =>
-                        URL.createObjectURL(file)
-                      );
-                      watch(category.validationString) != undefined
-                        ? setValue(category.validationString, [
-                            ...(watch(category.validationString) as string[]),
-                            ...filePaths,
-                          ])
-                        : setValue(category.validationString, [...filePaths]);
+                    console.log(watch(category.validationString));
+                    const filePaths = acceptedFiles.map((file) =>
+                      URL.createObjectURL(file)
+                    );
+                    watch(category.validationString) != undefined
+                      ? setValue(category.validationString, [
+                          ...(watch(category.validationString) as string[]),
+                          ...filePaths,
+                        ])
+                      : setValue(category.validationString, [...filePaths]);
 
-                      const files = acceptedFiles.map((file) => file);
-                      const newFiles = [...newPhotos.files, ...files];
-                      const newPaths = [...newPhotos.paths, ...filePaths];
-                      setNewPhotos({ files: newFiles, paths: newPaths });
-                    } else {
-                      // Optionally, show an error message if no valid image files were selected
-                      alert("Please select image files only.");
-                    }
+                    const newFiles = [...newPhotos.files, ...acceptedFiles];
+                    const newPaths = [...newPhotos.paths, ...filePaths];
+                    setNewPhotos({ files: newFiles, paths: newPaths });
                   }
                 }}
               />
@@ -488,7 +482,9 @@ export default function PhotosForm(form: formProps) {
       })}
       {errors.coverPhoto && (
         <p className="text-red-500 font-semibold">
-          {errors.coverPhoto.message}
+          {errors.coverPhoto.message}: To select a cover photo, click on the
+          top-right (three dots) of a photo, then click on{" "}
+          {`"Make cover photo"`}
         </p>
       )}
       <div className="w-full flex flex-row gap-3 justify-end p-3">
@@ -510,7 +506,7 @@ export default function PhotosForm(form: formProps) {
       </div>
       {Object.keys(errors).length > 0 && (
         <p className="text-red-500 font-medium animate-pulse mt-[-2rem] mx-auto">
-          Provide out all required photos to proceed
+          Provide all the required photos to proceed
         </p>
       )}
     </form>
