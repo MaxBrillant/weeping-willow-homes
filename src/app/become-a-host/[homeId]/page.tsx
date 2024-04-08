@@ -90,7 +90,7 @@ export default function BecomeAHost({
   return (
     <div className="min-h-screen flex flex-col">
       <div className="sticky top-0 z-50 w-full bg-white py-2">
-        <div className="flex flex-row gap-5 py-3 border-b-2">
+        <div className="flex flex-row p-3 border-b-2">
           <p className="font-bold text-xl">
             Turn Your Property into a Willow Home
           </p>
@@ -100,7 +100,7 @@ export default function BecomeAHost({
           className="w-full h-3 rounded-md bg-slate-300"
         />
       </div>
-      <div className="flex-grow flex flex-col items-center sm:px-10">
+      <div className="flex-grow flex flex-col items-center px-5 sm:px-10">
         {step === 0 && (
           <div id="step-1">
             <div

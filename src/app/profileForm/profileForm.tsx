@@ -259,7 +259,7 @@ export default function ProfileForm(form: formProps) {
         <Textarea
           {...register("bio")}
           defaultValue={defaultValues?.bio}
-          placeholder="This place offers a unique view of the city and its spendid mountains"
+          placeholder="I like travelling and my favourite outdoor activity is hiking"
         />
         <p
           className={

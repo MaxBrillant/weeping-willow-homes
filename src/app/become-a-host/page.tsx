@@ -59,7 +59,7 @@ export default function BecomeAHost() {
           className="w-full h-3 rounded-md bg-slate-300"
         />
       </div>
-      <div className="flex-grow flex flex-col items-center sm:px-10">
+      <div className="flex-grow flex flex-col items-center px-5 sm:px-10">
         <div id="step-1">
           <div
             id="step-1"
