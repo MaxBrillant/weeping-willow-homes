@@ -372,23 +372,33 @@ export default function PhotosForm(form: formProps) {
                 multiple
                 onChange={(e) => {
                   if (e.target.files) {
-                    console.log(watch(category.validationString));
-                    const filePaths = Array.from(e.target.files).map((file) =>
-                      URL.createObjectURL(file)
+                    const acceptedFiles = Array.from(e.target.files).filter(
+                      (file) => {
+                        // Check if the file type is an image
+                        return file.type.startsWith("image/");
+                      }
                     );
-                    watch(category.validationString) != undefined
-                      ? setValue(category.validationString, [
-                          ...(watch(category.validationString) as string[]),
-                          ...filePaths,
-                        ])
-                      : setValue(category.validationString, [...filePaths]);
 
-                    const files = Array.from(e.target.files).map(
-                      (file) => file
-                    );
-                    const newFiles = [...newPhotos.files, ...files];
-                    const newPaths = [...newPhotos.paths, ...filePaths];
-                    setNewPhotos({ files: newFiles, paths: newPaths });
+                    if (acceptedFiles.length > 0) {
+                      console.log(watch(category.validationString));
+                      const filePaths = acceptedFiles.map((file) =>
+                        URL.createObjectURL(file)
+                      );
+                      watch(category.validationString) != undefined
+                        ? setValue(category.validationString, [
+                            ...(watch(category.validationString) as string[]),
+                            ...filePaths,
+                          ])
+                        : setValue(category.validationString, [...filePaths]);
+
+                      const files = acceptedFiles.map((file) => file);
+                      const newFiles = [...newPhotos.files, ...files];
+                      const newPaths = [...newPhotos.paths, ...filePaths];
+                      setNewPhotos({ files: newFiles, paths: newPaths });
+                    } else {
+                      // Optionally, show an error message if no valid image files were selected
+                      alert("Please select image files only.");
+                    }
                   }
                 }}
               />
