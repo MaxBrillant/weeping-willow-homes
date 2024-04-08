@@ -1,15 +1,13 @@
 "use client";
 import {
   Carousel,
-  CarouselApi,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import { useEffect, useState } from "react";
+import { useRef } from "react";
+import Autoplay from "embla-carousel-autoplay";
 
 export default function CityShowcase() {
-  const [api, setApi] = useState<CarouselApi>();
-
   const cities = [
     "Nairobi",
     "Mombasa",
@@ -24,18 +22,11 @@ export default function CityShowcase() {
     "Watamu",
   ];
 
-  useEffect(() => {
-    console.log("done");
-    const interval = setInterval(() => {
-      api?.scrollNext();
-    }, 3000); // Adjust the delay as needed
-
-    return () => clearInterval(interval);
-  }, [api]);
+  const plugin = useRef(Autoplay({ duration: 1000 }));
 
   return (
     <Carousel
-      setApi={setApi}
+      plugins={[plugin.current]}
       orientation="vertical"
       opts={{
         align: "start",

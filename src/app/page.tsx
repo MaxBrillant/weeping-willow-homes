@@ -60,7 +60,7 @@ export default function Homes() {
           <p className="font-semibold text-xl text-center">
             Experience luxury in 11 Cities and Towns Across Kenya
           </p>
-          <div className="flex flex-row gap-3 items-center justify-center">
+          <div className="flex flex-col items-center pt-7 px-5 justify-center bg-white rounded-3xl drop-shadow-2xl">
             <FaLocationDot className="w-12 h-12" />
             <CityShowcase />
           </div>
