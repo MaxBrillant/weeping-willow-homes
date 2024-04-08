@@ -37,64 +37,44 @@ type returnedDataType = Array<{
 export async function addOrUpdatePhotos(formData: formDataType) {
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
+  const fileNames: string[] = [];
 
   const files = formData.newPhotosFiles.getAll("files") as File[];
-  const uploadPromises = await Promise.all(
-    files.map(async (file, index) => {
-      const fileToStorage = file;
-      console.log(fileToStorage);
 
-      const newFileName = randomUUID();
-      // Upload the file to Supabase Storage
-      const { error } = await supabase.storage
-        .from("home_photos")
-        .upload("public/" + newFileName, fileToStorage, {
-          contentType: fileToStorage.type, // Adjust based on the file type
-          cacheControl: "36000",
-        });
+  files.map((file, index) => {
+    const newFileName = randomUUID();
+    fileNames.push(newFileName);
 
-      if (error) {
-        console.log(
-          "Error while uploading photo " +
-            fileToStorage.name +
-            ": " +
-            error.message
-        );
-      }
+    const fileUrl =
+      "https://dxtymkfjqltlvlpxcmia.supabase.co/storage/v1/object/public/home_photos/public/" +
+      newFileName;
 
-      const { data } = supabase.storage
-        .from("home_photos")
-        .getPublicUrl("public/" + newFileName);
-
-      const fileUrl = data.publicUrl;
-
-      formData.coverPhoto =
-        formData.coverPhoto === formData.newPhotosPaths[index]
-          ? fileUrl
-          : formData.coverPhoto;
-      formData.sleepingSpace = formData.sleepingSpace.map((photo) =>
-        photo === formData.newPhotosPaths[index] ? fileUrl : photo
-      );
-      formData.livingSpace = formData.livingSpace.map((photo) =>
-        photo === formData.newPhotosPaths[index] ? fileUrl : photo
-      );
-      formData.bathrooms = formData.bathrooms.map((photo) =>
-        photo === formData.newPhotosPaths[index] ? fileUrl : photo
-      );
-      formData.kitchen = formData.kitchen.map((photo) =>
-        photo === formData.newPhotosPaths[index] ? fileUrl : photo
-      );
-      formData.building = formData.building.map((photo) =>
-        photo === formData.newPhotosPaths[index] ? fileUrl : photo
-      );
-      formData.outdoors = formData.outdoors.map((photo) =>
-        photo === formData.newPhotosPaths[index] ? fileUrl : photo
-      );
-      formData.additional = formData.additional.map((photo) =>
-        photo === formData.newPhotosPaths[index] ? fileUrl : photo
-      );
-    })
-  );
+    formData.coverPhoto =
+      formData.coverPhoto === formData.newPhotosPaths[index]
+        ? fileUrl
+        : formData.coverPhoto;
+    formData.sleepingSpace = formData.sleepingSpace.map((photo) =>
+      photo === formData.newPhotosPaths[index] ? fileUrl : photo
+    );
+    formData.livingSpace = formData.livingSpace.map((photo) =>
+      photo === formData.newPhotosPaths[index] ? fileUrl : photo
+    );
+    formData.bathrooms = formData.bathrooms.map((photo) =>
+      photo === formData.newPhotosPaths[index] ? fileUrl : photo
+    );
+    formData.kitchen = formData.kitchen.map((photo) =>
+      photo === formData.newPhotosPaths[index] ? fileUrl : photo
+    );
+    formData.building = formData.building.map((photo) =>
+      photo === formData.newPhotosPaths[index] ? fileUrl : photo
+    );
+    formData.outdoors = formData.outdoors.map((photo) =>
+      photo === formData.newPhotosPaths[index] ? fileUrl : photo
+    );
+    formData.additional = formData.additional.map((photo) =>
+      photo === formData.newPhotosPaths[index] ? fileUrl : photo
+    );
+  });
 
   if (!formData.photosId) {
     const { data, error } = await supabase
@@ -138,6 +118,30 @@ export async function addOrUpdatePhotos(formData: formDataType) {
     console.log(
       "Photos of ID: " + formData.photosId + " was successfully updated"
     );
+  }
+
+  if (files.length > 0) {
+    files.map(async (file, index) => {
+      const fileToStorage = file;
+      console.log(fileToStorage);
+
+      // Upload the file to Supabase Storage
+      const { error } = await supabase.storage
+        .from("home_photos")
+        .upload("public/" + fileNames[index], fileToStorage, {
+          contentType: fileToStorage.type, // Adjust based on the file type
+          cacheControl: "36000",
+        });
+
+      if (error) {
+        console.log(
+          "Error while uploading photo " +
+            fileToStorage.name +
+            ": " +
+            error.message
+        );
+      }
+    });
   }
 
   if (formData.photosToDelete.length > 0) {
