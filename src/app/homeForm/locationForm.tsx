@@ -221,27 +221,6 @@ export default function LocationForm(form: formProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7 p-7">
-      {(form.saveAndExit || form.saveAndExit == undefined) && (
-        <div className="relative mt-[-1.75rem] pb-7">
-          <Button
-            variant={"outline"}
-            className="absolute top-3 right-0"
-            disabled={isSubmitting}
-            onClick={async () => {
-              if (coordinates[0] !== 0 && coordinates[1] !== 0) {
-                const isFormValid = await trigger();
-                if (isFormValid) {
-                  setTimeout(() => {
-                    push("/hosting");
-                  }, 100);
-                }
-              }
-            }}
-          >
-            Save & exit
-          </Button>
-        </div>
-      )}
       <div className="flex flex-col gap-3">
         <p className="font-bold text-lg">City / Town</p>
         <OptionContainer
@@ -393,10 +372,28 @@ export default function LocationForm(form: formProps) {
           )}
         </div>
       )}
-      <div className="w-full flex flex-row gap-3 justify-end p-3">
-        {form.backFunctions.length > 0 && (
+      <div className="w-full flex flex-wrap gap-3 justify-end p-3">
+        {(form.saveAndExit || form.saveAndExit == undefined) && (
           <Button
             variant={"outline"}
+            disabled={isSubmitting}
+            onClick={async () => {
+              if (coordinates[0] !== 0 && coordinates[1] !== 0) {
+                const isFormValid = await trigger();
+                if (isFormValid) {
+                  setTimeout(() => {
+                    push("/hosting");
+                  }, 100);
+                }
+              }
+            }}
+          >
+            Save & exit
+          </Button>
+        )}
+        {form.backFunctions.length > 0 && (
+          <Button
+            variant={"link"}
             onClick={() =>
               form.backFunctions.map((backFunction: () => void) => {
                 backFunction();

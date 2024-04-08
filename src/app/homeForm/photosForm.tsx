@@ -239,25 +239,9 @@ export default function PhotosForm(form: formProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7 p-7">
-      {(form.saveAndExit || form.saveAndExit == undefined) && (
-        <div className="relative mt-[-1.75rem] pb-7">
-          <Button
-            variant={"outline"}
-            className="absolute top-3 right-0"
-            disabled={isSubmitting}
-            onClick={async () => {
-              const isFormValid = await trigger();
-              if (isFormValid) {
-                setTimeout(() => {
-                  push("/hosting");
-                }, 100);
-              }
-            }}
-          >
-            Save & exit
-          </Button>
-        </div>
-      )}
+      <p className="font-medium text-center bg-yellow-100 border border-yellow-600 p-3 rounded-2xl">
+        Only JPG, PNG and WEBP image formats are supported
+      </p>
       {photoCategories.map((category, index) => {
         return (
           <div key={index} className="flex flex-col gap-3">
@@ -375,7 +359,12 @@ export default function PhotosForm(form: formProps) {
                     const acceptedFiles = Array.from(e.target.files).filter(
                       (file) => {
                         // Check if the file type is an image
-                        return file.type.startsWith("image/");
+                        return (
+                          file.type === "image/jpeg" ||
+                          file.type === "image/jpg" ||
+                          file.type === "image/png" ||
+                          file.type === "image/webp"
+                        );
                       }
                     );
 
@@ -487,10 +476,26 @@ export default function PhotosForm(form: formProps) {
           {`"Make cover photo"`}
         </p>
       )}
-      <div className="w-full flex flex-row gap-3 justify-end p-3">
-        {form.backFunctions.length > 0 && (
+      <div className="w-full flex flex-wrap gap-3 justify-end p-3">
+        {(form.saveAndExit || form.saveAndExit == undefined) && (
           <Button
             variant={"outline"}
+            disabled={isSubmitting}
+            onClick={async () => {
+              const isFormValid = await trigger();
+              if (isFormValid) {
+                setTimeout(() => {
+                  push("/hosting");
+                }, 100);
+              }
+            }}
+          >
+            Save & exit
+          </Button>
+        )}
+        {form.backFunctions.length > 0 && (
+          <Button
+            variant={"link"}
             onClick={() =>
               form.backFunctions.map((backFunction: () => void) => {
                 backFunction();

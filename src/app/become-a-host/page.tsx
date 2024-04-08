@@ -13,7 +13,6 @@ import { IoBed } from "react-icons/io5";
 import { FaLocationDot, FaMoneyBillWave, FaMoneyBills } from "react-icons/fa6";
 import { IoMdPhotos } from "react-icons/io";
 import { HiSparkles } from "react-icons/hi2";
-import { FaMoneyBillWaveAlt } from "react-icons/fa";
 import { MdOutlineRule } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 
@@ -43,7 +42,29 @@ export default function BecomeAHost() {
   };
 
   useEffect(() => {
-    handleSignedOutUser();
+    if (!open) {
+      handleSignedOutUser();
+    }
+  }, [open]);
+
+  useEffect(() => {
+    const checkProfile = async()=>{
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+  
+      if (session) {
+        const userHasProfile = await UserHasProfile();
+        if (!userHasProfile) {
+          push(
+            `/users/create-profile?redirect-to=${location
+              .toString()
+              .replaceAll("&", "!")}`
+          );
+            }}
+  
+          }
+          checkProfile();
   }, []);
   return (
     <div className="min-h-screen flex flex-col">
