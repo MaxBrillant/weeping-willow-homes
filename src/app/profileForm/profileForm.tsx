@@ -158,7 +158,6 @@ export default function ProfileForm(form: formProps) {
     form.submitFunctions.map((submitFunction: () => void) => {
       submitFunction();
     });
-    setIsSubmitting(false);
 
     await SendEmail({
       type: "profile-creation",
@@ -167,6 +166,7 @@ export default function ProfileForm(form: formProps) {
       homeTitle: "",
       homeLink: "",
     });
+    setIsSubmitting(false);
   };
 
   if (isLoading) {
