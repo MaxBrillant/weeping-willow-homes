@@ -58,8 +58,8 @@ export default async function HomeInformation({
         <p className="font-medium text-lg">
           {`You don't have access to this home.`}
         </p>
-        <Link href={"/become-a-host"}>
-          <Button>Start hosting and earn</Button>
+        <Link href={"/hosting"}>
+          <Button>See all your homes</Button>
         </Link>
       </div>
     );

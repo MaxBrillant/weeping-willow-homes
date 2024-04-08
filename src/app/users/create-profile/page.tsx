@@ -8,7 +8,7 @@ export default function CreateProfile() {
   const { push } = useRouter();
   const supabase = createClientComponentClient();
   return (
-    <div className="flex-grow flex flex-col items-center sm:px-10 mx-5">
+    <div className="flex-grow flex flex-col items-center px-5 sm:px-10">
       <div>
         <div className="flex flex-col w-full border border-black mt-10 rounded-2xl">
           <p className="bg-slate-200 p-5 font-medium border-b border-black rounded-t-2xl">
