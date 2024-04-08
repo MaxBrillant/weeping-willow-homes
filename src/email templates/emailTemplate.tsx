@@ -22,12 +22,12 @@ export const EmailTemplate = (email: EmailTemplateProps) => {
             width="150"
             height="150"
           />
-          <Heading>Profile update</Heading>
+          <Heading>Your profile has been successfully updated</Heading>
           <Text>
-            Your profile has been successfully updated. Your profile will be
-            visible to anyone booking your homes, or to your hosts.
+            Your profile will be visible to anyone booking your homes, or to
+            your hosts.
           </Text>
-          <Button href={email.profileLink}>Check Your New Profile</Button>
+          <Button href={email.profileLink}>Check Your Profile</Button>
         </Container>
       ) : email.type === "home-creation" ? (
         <Container>

@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       to: email,
       subject:
         type === "profile-creation"
-          ? "Welcome to Willow Homes"
+          ? "Profile update"
           : type === "home-creation"
           ? "Home Setup has been initiated"
           : "Home Setup completed",
