@@ -11,6 +11,8 @@ import getFacilitiesAndFeaturesDefaultValues from "@/api/defaultValues/facilitie
 import { addOrUpdateFacilitiesAndFeatures } from "@/api/mutations/facilitiesAndFeaturesMutations";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
+import { useRouter } from "next/navigation";
+import Loading from "../loading";
 
 type schema = z.infer<typeof FacilitiesAndFeaturesFormSchema>;
 
@@ -18,6 +20,7 @@ type formProps = {
   backFunctions: (() => void | undefined)[];
   submitFunctions: (() => void | undefined)[];
   homeId: number | null;
+  saveAndExit?: boolean;
 };
 type facilitiesType = {
   id: string;
@@ -36,6 +39,7 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
   const {
     handleSubmit,
     setValue,
+    trigger,
     formState: { errors },
   } = useForm<schema>({
     resolver: zodResolver(FacilitiesAndFeaturesFormSchema),
@@ -53,6 +57,8 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
     facilitiesType[]
   >([]);
   const [featuresList, setFeaturesList] = useState<facilitiesType[]>([]);
+
+  const { push } = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -199,11 +205,30 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
   };
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7 p-7">
+      {(form.saveAndExit || form.saveAndExit == undefined) && (
+        <div className="relative mt-[-1.75rem] pb-7">
+          <Button
+            variant={"outline"}
+            className="absolute top-3 right-0"
+            disabled={isSubmitting}
+            onClick={async () => {
+              const isFormValid = await trigger();
+              if (isFormValid) {
+                setTimeout(() => {
+                  push("/hosting");
+                }, 500);
+              }
+            }}
+          >
+            Save & exit
+          </Button>
+        </div>
+      )}
       <div className="flex flex-col gap-3">
         <p className="font-bold text-lg">Facilities</p>
         <p className="font-normal text-sm">
@@ -315,6 +340,11 @@ export default function FacilitiesAndFeaturesForm(form: formProps) {
           Save and continue
         </Button>
       </div>
+      {Object.keys(errors).length > 0 && (
+        <p className="text-red-500 font-medium animate-pulse mt-[-2rem] mx-auto">
+          Select all required facilities and features to proceed
+        </p>
+      )}
     </form>
   );
 }

@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
-import BackButton from "@/app/components/backButton";
 import { Progress } from "@/components/ui/progress";
 import HomeInformationForm from "@/app/homeForm/homeInformationForm";
 import AccommodationForm from "@/app/homeForm/accommodationForm";
@@ -16,7 +15,8 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import UserHasProfile from "@/api/fetch/checkIfUserHasProfile";
-import SuccessIcon from "../../../icons/search.svg";
+import Image from "next/image";
+import Loading from "@/app/loading";
 
 export default function BecomeAHost({
   params,
@@ -76,20 +76,23 @@ export default function BecomeAHost({
     handleSignedOutUserAndCheckForUserAccess();
   }, []);
 
+  useEffect(() => {
+    push("/become-a-host/" + params.homeId + "?step=" + step);
+  }, [step]);
+
   if (!hasAccess && !isLoading) {
     return <p>{`You don't have access.`}</p>;
   }
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
   return (
     <div className="min-h-screen flex flex-col">
       <div className="sticky top-0 z-50 w-full bg-white py-2">
         <div className="flex flex-row gap-5 py-3 border-b-2">
-          <BackButton />
           <p className="font-bold text-xl">
-            Turn Your Property into a Weeping Willow Home
+            Turn Your Property into a Willow Home
           </p>
         </div>
         <Progress
@@ -195,7 +198,7 @@ export default function BecomeAHost({
             <div className="m-auto h-10 w-1 bg-slate-500"></div>
             <div className="flex flex-col w-full border border-black rounded-2xl">
               <p className="bg-slate-200 p-5 font-medium border-b border-black rounded-t-2xl">
-                List the Features and Facilities that make your property unique
+                List the Facilities and Features that make your property unique
                 and desirable.
               </p>
               <FacilitiesAndFeaturesForm
@@ -262,15 +265,34 @@ export default function BecomeAHost({
         <Dialog open={isCompleted}>
           <DialogContent className="w-full h-full overflow-auto">
             <div className="flex flex-col gap-5 p-5 items-center justify-center">
-              <SuccessIcon className="w-20 h-20" />
-              <p className="text-3xl font-semibold">Welcome on board</p>
-              <p>
+              <div className="grid grid-cols-2">
+                <Image
+                  src="/confetti-1.png"
+                  alt="confetti"
+                  width={300}
+                  height={300}
+                  priority
+                  loading="eager"
+                  className="w-full aspect-square object-cover"
+                />
+                <Image
+                  src="/confetti-2.png"
+                  alt="confetti"
+                  width={300}
+                  height={300}
+                  priority
+                  loading="eager"
+                  className="w-full aspect-square object-cover"
+                />
+              </div>
+              <p className="text-5xl font-bold text-center">Welcome on board</p>
+              <p className="font-medium text-lg">
                 {`You've just taken a significant step towards making your
                 property a cherished part of someone's journey. Here's to the
                 next chapter of your home's story!`}
               </p>
-              <p className="text-lg font-semibold">{`What's next?`}</p>
-              <p>
+              <p className="text-2xl font-bold">{`What's next?`}</p>
+              <p className="font-medium text-lg">
                 {`We will reach out to you via phone or email to begin the verification process of your property. Our goal is to guarantee a secure and opulent experience for your future guests, which is why your property will only be available for booking following our verification.`}
               </p>
               <Link href={"/hosting"}>

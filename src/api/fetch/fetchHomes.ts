@@ -6,7 +6,12 @@ import { cookies } from "next/headers";
 type returnedHomesTypes = Array<{
   id: number;
   title: string;
-  type_of_property: "house" | "apartment";
+  type_of_property:
+    | "penthouse"
+    | "townhouse"
+    | "condominium"
+    | "bungalow"
+    | "apartment";
   status: "verified";
   home_facilities_and_features: [
     {
@@ -36,7 +41,18 @@ type returnedHomesTypes = Array<{
     bedrooms: number;
   };
   home_location: {
-    city: "Nairobi, Kenya" | "Mombasa, Kenya";
+    city:
+      | "Nairobi, Kenya"
+      | "Mombasa, Kenya"
+      | "Kisumu, Kenya"
+      | "Nakuru, Kenya"
+      | "Nanyuki, Kenya"
+      | "Naivasha, Kenya"
+      | "Eldoret, Kenya"
+      | "Malindi, Kenya"
+      | "Tsavo, Kenya"
+      | "Watamu, Kenya"
+      | "Maasai Mara, Kenya";
   };
   home_fees: {
     currency: "usd" | "kes";
@@ -57,8 +73,24 @@ type returnedHomesTypes = Array<{
 export type homesType = Array<{
   id: number;
   title: string;
-  city: "Nairobi, Kenya" | "Mombasa, Kenya";
-  typeOfProperty: "house" | "apartment";
+  city:
+    | "Nairobi, Kenya"
+    | "Mombasa, Kenya"
+    | "Kisumu, Kenya"
+    | "Nakuru, Kenya"
+    | "Nanyuki, Kenya"
+    | "Naivasha, Kenya"
+    | "Eldoret, Kenya"
+    | "Malindi, Kenya"
+    | "Tsavo, Kenya"
+    | "Watamu, Kenya"
+    | "Maasai Mara, Kenya";
+  typeOfProperty:
+    | "penthouse"
+    | "townhouse"
+    | "condominium"
+    | "bungalow"
+    | "apartment";
   numberOfGuests: number;
   numberOfBedrooms: number;
   numberOfBeds: number;

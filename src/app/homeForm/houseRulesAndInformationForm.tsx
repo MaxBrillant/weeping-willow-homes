@@ -22,6 +22,8 @@ import {
 import getHouseRulesAndInformationDefaultValues from "@/api/defaultValues/houseRulesAndInformationForm";
 import { addOrUpdateHouseRulesAndInformation } from "@/api/mutations/houseRulesAndInformationMutations";
 import { Separator } from "@/components/ui/separator";
+import { useRouter } from "next/navigation";
+import Loading from "../loading";
 
 type schema = z.infer<typeof HouseRulesAndInformationFormSchema>;
 type hoursType = z.infer<typeof hours>;
@@ -30,6 +32,7 @@ type formProps = {
   backFunctions: (() => void | undefined)[];
   submitFunctions: (() => void | undefined)[];
   homeId: number | null;
+  saveAndExit?: boolean;
 };
 type defaultValuesType = {
   houseRulesAndInformationId: number;
@@ -47,6 +50,7 @@ export default function HouseRulesAndInformation(form: formProps) {
     watch,
     handleSubmit,
     setValue,
+    trigger,
     formState: { errors },
   } = useForm<schema>({
     resolver: zodResolver(HouseRulesAndInformationFormSchema),
@@ -62,6 +66,8 @@ export default function HouseRulesAndInformation(form: formProps) {
   const [selectedOptionForSmoking, setSelectedOptionForSmoking] = useState<
     number[]
   >([]);
+
+  const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -199,10 +205,29 @@ export default function HouseRulesAndInformation(form: formProps) {
   };
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7 p-7">
+      {(form.saveAndExit || form.saveAndExit == undefined) && (
+        <div className="relative mt-[-1.75rem] pb-10">
+          <Button
+            variant={"outline"}
+            className="absolute top-3 right-0"
+            disabled={isSubmitting}
+            onClick={async () => {
+              const isFormValid = await trigger();
+              if (isFormValid) {
+                setTimeout(() => {
+                  push("/hosting");
+                }, 100);
+              }
+            }}
+          >
+            Save & exit
+          </Button>
+        </div>
+      )}
       <div className="flex flex-row gap-2">
         <div className="w-full space-y-3">
           <p className="font-bold text-lg">Are events / parties allowed?</p>
@@ -280,7 +305,7 @@ export default function HouseRulesAndInformation(form: formProps) {
           environment for all guests.
         </p>
         <div className="flex flex-row gap-2 items-center">
-          <p>From:</p>
+          <p className="w-12 text-right">From</p>
           <Select
             defaultValue={watch("startOfQuietHours")}
             onValueChange={(e: hoursType | "No time set") => {
@@ -315,7 +340,7 @@ export default function HouseRulesAndInformation(form: formProps) {
           )}
 
         <div className="flex flex-row gap-2 items-center">
-          <p>To:</p>
+          <p className="w-12 text-right">To</p>
           <Select
             defaultValue={watch("endOfQuietHours")}
             onValueChange={(e: hoursType | "No time set") => {
@@ -415,6 +440,11 @@ export default function HouseRulesAndInformation(form: formProps) {
           Save and continue
         </Button>
       </div>
+      {Object.keys(errors).length > 0 && (
+        <p className="text-red-500 font-medium animate-pulse mt-[-2rem] mx-auto">
+          Fill out all required details to proceed
+        </p>
+      )}
     </form>
   );
 }

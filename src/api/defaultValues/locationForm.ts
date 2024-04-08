@@ -6,7 +6,18 @@ import { cookies } from "next/headers";
 type returnedDefaultValuesType = Array<{
   home_location: {
     id: number;
-    city: "Nairobi, Kenya" | "Mombasa, Kenya";
+    city:
+      | "Nairobi, Kenya"
+      | "Mombasa, Kenya"
+      | "Kisumu, Kenya"
+      | "Nakuru, Kenya"
+      | "Nanyuki, Kenya"
+      | "Naivasha, Kenya"
+      | "Eldoret, Kenya"
+      | "Malindi, Kenya"
+      | "Tsavo, Kenya"
+      | "Watamu, Kenya"
+      | "Maasai Mara, Kenya";
     longitude: number;
     latitude: number;
     street_address: string;
@@ -16,7 +27,18 @@ type returnedDefaultValuesType = Array<{
 
 type defaultValuesType = {
   locationId: number;
-  city: "Nairobi, Kenya" | "Mombasa, Kenya";
+  city:
+    | "Nairobi, Kenya"
+    | "Mombasa, Kenya"
+    | "Kisumu, Kenya"
+    | "Nakuru, Kenya"
+    | "Nanyuki, Kenya"
+    | "Naivasha, Kenya"
+    | "Eldoret, Kenya"
+    | "Malindi, Kenya"
+    | "Tsavo, Kenya"
+    | "Watamu, Kenya"
+    | "Maasai Mara, Kenya";
   longitude: number;
   latitude: number;
   streetAddress: string;

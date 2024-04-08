@@ -12,6 +12,8 @@ import { CurrencyInput } from "../components/currencyInput";
 import getFeesDefaultValues from "@/api/defaultValues/feesForm";
 import { addOrUpdateFeesInformation } from "@/api/mutations/feesFormMutations";
 import { Separator } from "@/components/ui/separator";
+import { useRouter } from "next/navigation";
+import Loading from "../loading";
 
 type schema = z.infer<typeof FeesAndFinancesFormSchema>;
 
@@ -19,6 +21,7 @@ type formProps = {
   backFunctions: (() => void | undefined)[];
   submitFunctions: (() => void | undefined)[];
   homeId: number | null;
+  saveAndExit?: boolean;
 };
 
 type defaultValuesType = {
@@ -31,6 +34,7 @@ export default function FeesForm(form: formProps) {
     handleSubmit,
     watch,
     setValue,
+    trigger,
     formState: { errors },
   } = useForm<schema>({
     resolver: zodResolver(FeesAndFinancesFormSchema),
@@ -44,6 +48,8 @@ export default function FeesForm(form: formProps) {
   const [selectedBookingOption, setSelectedBookingOption] = useState<number[]>(
     []
   );
+
+  const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -145,12 +151,31 @@ export default function FeesForm(form: formProps) {
 
   {
     if (isLoading) {
-      return <p>Loading...</p>;
+      return <Loading />;
     }
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7 p-7">
+      {(form.saveAndExit || form.saveAndExit == undefined) && (
+        <div className="relative mt-[-1.75rem] pb-7">
+          <Button
+            variant={"outline"}
+            className="absolute top-3 right-0"
+            disabled={isSubmitting}
+            onClick={async () => {
+              const isFormValid = await trigger();
+              if (isFormValid) {
+                setTimeout(() => {
+                  push("/hosting");
+                }, 100);
+              }
+            }}
+          >
+            Save & exit
+          </Button>
+        </div>
+      )}
       <div className="flex flex-col gap-3">
         <p className="font-bold text-lg">Currency</p>
         <p className="font-normal text-sm">
@@ -175,30 +200,32 @@ export default function FeesForm(form: formProps) {
         <p className="font-normal text-sm">
           Set the standard rental rates for your accommodation.
         </p>
-        <div className="flex flex-row gap-2 w-fit mx-auto my-7 p-2 bg-slate-300 items-center rounded-2xl ">
-          <p className="font-semibold text-lg">Monthly</p>
-          <button
-            className="flex flex-row items-center p-1 px-3 gap-1 bg-white rounded-xl"
-            onClick={(e) => {
-              e.preventDefault();
-              if (regularFeesInputRef.current) {
-                regularFeesInputRef.current.focus();
-              }
+
+        <button
+          className="flex flex-row items-center p-2 my-7 gap-1 mx-auto"
+          onClick={(e) => {
+            e.preventDefault();
+            if (regularFeesInputRef.current) {
+              regularFeesInputRef.current.focus();
+            }
+          }}
+        >
+          <p>{selectedCurrency[0] === 0 ? "$" : "KES"}</p>
+          <CurrencyInput
+            ref={regularFeesInputRef}
+            defaultValue={watch("monthlyFees")}
+            onInput={(e) => {
+              setValue(
+                "monthlyFees",
+                Number(
+                  e.currentTarget.value
+                    .replaceAll(",", "")
+                    .replaceAll(/[^0-9,]/g, "")
+                )
+              );
             }}
-          >
-            <p>{selectedCurrency[0] === 0 ? "$" : "KES"}</p>
-            <CurrencyInput
-              defaultValue={watch("monthlyFees")}
-              {...register("monthlyFees", {
-                setValueAs: (v) => (v === "" ? "undefined" : parseInt(v, 10)),
-              })}
-              ref={regularFeesInputRef}
-              onChange={(e) => {
-                setValue("monthlyFees", Number(e.currentTarget.value));
-              }}
-            />
-          </button>
-        </div>
+          />
+        </button>
         {errors.monthlyFees && (
           <p className="text-red-500 font-semibold">
             {errors.monthlyFees.message}
@@ -207,7 +234,7 @@ export default function FeesForm(form: formProps) {
       </div>
       <Separator />
       <div className="flex flex-col gap-3">
-        <p className="font-bold text-lg">Initial Setup Fee</p>
+        <p className="font-bold text-lg">Initial Setup Fee (optional)</p>
         <p className="font-normal text-sm">
           Outline the initial costs associated with booking your property. This
           includes any upfront fees such as a deposit, cleaning fee, or any
@@ -228,15 +255,16 @@ export default function FeesForm(form: formProps) {
             defaultValue={
               watch("firstTimeFees") != undefined ? watch("firstTimeFees") : ""
             }
-            {...register("firstTimeFees", {
-              setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
-            })}
             ref={firstTimeFeesInputRef}
-            onChange={(e) => {
+            onInput={(e) => {
               setValue(
                 "firstTimeFees",
                 e.currentTarget.value != ""
-                  ? Number(e.currentTarget.value)
+                  ? Number(
+                      e.currentTarget.value
+                        .replaceAll(",", "")
+                        .replaceAll(/[^0-9,]/g, "")
+                    )
                   : undefined
               );
             }}
@@ -247,25 +275,25 @@ export default function FeesForm(form: formProps) {
             {errors.firstTimeFees.message}
           </p>
         )}
-        <p className="font-bold text-lg">
-          Description of the Initial Setup Fee (optional)
-        </p>
-        <Textarea
-          {...register("firstTimeFeesDescription", {
-            setValueAs: (v) => (v === "" ? undefined : v),
-          })}
-          defaultValue={
-            defaultValues?.firstTimeFeeDescription
-              ? defaultValues?.firstTimeFeeDescription
-              : ""
-          }
-          placeholder="Describe the included fees and other details here"
-        />
-        {errors.firstTimeFeesDescription && (
-          <p className="text-red-500 font-semibold">
-            {errors.firstTimeFeesDescription.message}
-          </p>
+        {watch("firstTimeFees") != undefined && (
+          <Textarea
+            {...register("firstTimeFeesDescription", {
+              setValueAs: (v) => (v === "" ? undefined : v),
+            })}
+            defaultValue={
+              defaultValues?.firstTimeFeeDescription
+                ? defaultValues?.firstTimeFeeDescription
+                : ""
+            }
+            placeholder="Describe the included fees and other details here"
+          />
         )}
+        {watch("firstTimeFees") != undefined &&
+          errors.firstTimeFeesDescription && (
+            <p className="text-red-500 font-semibold">
+              {errors.firstTimeFeesDescription.message}
+            </p>
+          )}
       </div>
       <Separator />
       <div className="flex flex-col gap-3">
@@ -306,6 +334,11 @@ export default function FeesForm(form: formProps) {
           Save and continue
         </Button>
       </div>
+      {Object.keys(errors).length > 0 && (
+        <p className="text-red-500 font-medium animate-pulse mt-[-2rem] mx-auto">
+          Fill out all required details to proceed
+        </p>
+      )}
     </form>
   );
 }

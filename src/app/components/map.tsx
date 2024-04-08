@@ -31,6 +31,7 @@ export default function Map(location: mapProps) {
         center: [location.long, location.lat],
         zoom: 15,
         scrollZoom: location.scrollToZoom,
+        dragPan: location.scrollToZoom,
         optimizeForTerrain: true,
       });
       setMap(newMap);

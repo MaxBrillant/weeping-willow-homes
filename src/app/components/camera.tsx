@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { IoMdCamera } from "react-icons/io";
+import { RiAccountCircleLine } from "react-icons/ri";
 
 const SelfieCamera = (props: {
   setProfilePhoto: Dispatch<SetStateAction<Blob | undefined>>;
@@ -76,7 +78,7 @@ const SelfieCamera = (props: {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {profilePhoto != undefined ? (
-          <div>
+          <div className="w-fit">
             <Image
               src={URL.createObjectURL(profilePhoto)}
               alt="profile"
@@ -87,7 +89,7 @@ const SelfieCamera = (props: {
             <p>Click here to change your profile picture</p>
           </div>
         ) : props.defaultPhoto != undefined ? (
-          <div>
+          <div className="w-fit">
             <Image
               src={props.defaultPhoto}
               alt="profile"
@@ -98,23 +100,33 @@ const SelfieCamera = (props: {
             <p>Click here to change your profile picture</p>
           </div>
         ) : (
-          <button className="w-36 h-36 bg-slate-300 rounded-full">P</button>
+          <div className="w-fit">
+            <button className="w-36 h-36 bg-slate-300 rounded-full text-2xl font-semibold">
+              <RiAccountCircleLine className="w-36 h-36 p-7 fill-slate-700" />
+            </button>
+            <p>Click here to change your profile picture</p>
+          </div>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] max-h-[500px] overflow-auto">
-        <DialogHeader>
-          <DialogTitle>Take a selfie</DialogTitle>
-        </DialogHeader>
-        <div className="w-full h-full flex flex-col">
+        <div className="w-full h-fit flex flex-col items-center gap-3">
+          <h1>Make sure your face is visible</h1>
           {open && (
             <video
               ref={videoRef}
-              className="aspect-square rounded-full object-cover"
+              className="h-80 aspect-square rounded-full object-cover"
               autoPlay
               playsInline
             />
           )}
-          <Button onClick={capturePhoto}>Take Photo</Button>
+          <Button
+            onClick={capturePhoto}
+            size={"icon"}
+            className="w-16 h-16 p-3 rounded-full"
+            asChild
+          >
+            <IoMdCamera className="p-3 aspect-square" />
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

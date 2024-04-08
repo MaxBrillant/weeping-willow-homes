@@ -7,7 +7,18 @@ type returnedHostHomesType = Array<{
   id: number;
   title: string;
   home_location: {
-    city: "Nairobi, Kenya" | "Mombasa, Kenya";
+    city:
+      | "Nairobi, Kenya"
+      | "Mombasa, Kenya"
+      | "Kisumu, Kenya"
+      | "Nakuru, Kenya"
+      | "Nanyuki, Kenya"
+      | "Naivasha, Kenya"
+      | "Eldoret, Kenya"
+      | "Malindi, Kenya"
+      | "Tsavo, Kenya"
+      | "Watamu, Kenya"
+      | "Maasai Mara, Kenya";
   } | null;
   home_photos: {
     cover_photo: string;
@@ -24,7 +35,19 @@ type returnedHostHomesType = Array<{
 type hostHomesType = Array<{
   id: number;
   title: string;
-  city: "Nairobi, Kenya" | "Mombasa, Kenya" | null;
+  city:
+    | "Nairobi, Kenya"
+    | "Mombasa, Kenya"
+    | "Kisumu, Kenya"
+    | "Nakuru, Kenya"
+    | "Nanyuki, Kenya"
+    | "Naivasha, Kenya"
+    | "Eldoret, Kenya"
+    | "Malindi, Kenya"
+    | "Tsavo, Kenya"
+    | "Watamu, Kenya"
+    | "Maasai Mara, Kenya"
+    | null;
   coverPhotoUrl: string | null;
   status: "in-progress" | "completed" | "verified";
   creationProgress: number;

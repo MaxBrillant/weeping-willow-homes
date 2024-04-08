@@ -12,6 +12,7 @@ import getHomeInformationDefaultValues from "@/api/defaultValues/homeInformation
 import { createOrUpdateHome } from "@/api/mutations/homeInformationMutations";
 import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
+import Loading from "../loading";
 
 type schema = z.infer<typeof PropertyFormSchema>;
 
@@ -22,7 +23,12 @@ type formProps = {
 type defaultValuesType = {
   id: number;
   title: string;
-  typeOfProperty: "house" | "apartment";
+  typeOfProperty:
+    | "penthouse"
+    | "townhouse"
+    | "condominium"
+    | "bungalow"
+    | "apartment";
   description: string;
   propertySize: number | undefined;
 };
@@ -63,11 +69,19 @@ export default function HomeInformationForm(form: formProps) {
               ? values.propertySize
               : undefined,
           });
-          if (values.typeOfProperty === "house") {
-            setSelectedType([0]);
-          } else if (values?.typeOfProperty === "apartment") {
-            setSelectedType([1]);
-          }
+
+          const homeTypes = [
+            "penthouse",
+            "townhouse",
+            "condominium",
+            "bungalow",
+            "apartment",
+          ];
+          setSelectedType([
+            homeTypes.indexOf(
+              homeTypes.filter((type) => type === values.typeOfProperty)[0]
+            ),
+          ]);
         } else {
           setDefaultValues(undefined);
         }
@@ -83,7 +97,22 @@ export default function HomeInformationForm(form: formProps) {
 
   useEffect(() => {
     if (selectedType.length > 0) {
-      setValue("typeOfProperty", selectedType[0] === 0 ? "house" : "apartment");
+      const homeTypes = [
+        "penthouse",
+        "townhouse",
+        "condominium",
+        "bungalow",
+        "apartment",
+      ];
+      setValue(
+        "typeOfProperty",
+        homeTypes.filter((type, index) => index === selectedType[0])[0] as
+          | "penthouse"
+          | "townhouse"
+          | "condominium"
+          | "bungalow"
+          | "apartment"
+      );
     }
   }, [selectedType]);
 
@@ -116,7 +145,7 @@ export default function HomeInformationForm(form: formProps) {
   };
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
 
   return (
@@ -150,7 +179,13 @@ export default function HomeInformationForm(form: formProps) {
           standalone house or an apartment within a building.`}
         </p>
         <OptionContainer
-          options={["House", "Apartment"]}
+          options={[
+            "Penthouse",
+            "Townhouse",
+            "Condominium",
+            "Bungalow",
+            "Apartment",
+          ]}
           multipleSelectionEnabled={false}
           selectedOptions={selectedType}
           setSelectedOptions={setSelectedType}
@@ -215,6 +250,11 @@ export default function HomeInformationForm(form: formProps) {
           Save and continue
         </Button>
       </div>
+      {Object.keys(errors).length > 0 && (
+        <p className="text-red-500 font-medium animate-pulse mt-[-2rem] mx-auto">
+          Fill out all required details to proceed
+        </p>
+      )}
     </form>
   );
 }

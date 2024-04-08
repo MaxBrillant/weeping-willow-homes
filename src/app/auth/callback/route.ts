@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   console.log(requestUrl);
   const code = requestUrl.searchParams.get("code");
   const redirectTo = requestUrl.searchParams.get("redi");
-  const redirectUrl = redirectTo ? redirectTo : requestUrl.origin;
+  const redirectUrl = redirectTo ? redirectTo : requestUrl.origin + "/hosting";
 
   if (code) {
     const cookieStore = cookies();

@@ -9,6 +9,8 @@ import NumberSelection from "../components/numberSelection";
 import getAccommodationInformationDefaultValues from "@/api/defaultValues/accommodationInformation";
 import { addOrUpdateAccommodationInformation } from "@/api/mutations/accomodationInformationMutations";
 import { Separator } from "@/components/ui/separator";
+import { useRouter } from "next/navigation";
+import Loading from "../loading";
 
 type schema = z.infer<typeof AccommodationFormSchema>;
 
@@ -16,6 +18,7 @@ type formProps = {
   backFunctions: (() => void | undefined)[];
   submitFunctions: (() => void | undefined)[];
   homeId: number | null;
+  saveAndExit?: boolean;
 };
 
 type defaultValuesType = {
@@ -28,6 +31,7 @@ export default function AccommodationForm(form: formProps) {
   const {
     handleSubmit,
     setValue,
+    trigger,
     formState: { errors },
   } = useForm<schema>({
     resolver: zodResolver(AccommodationFormSchema),
@@ -43,6 +47,8 @@ export default function AccommodationForm(form: formProps) {
     useState<number>(1);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { push } = useRouter();
 
   useEffect(() => {
     const getDefaultValues = async () => {
@@ -125,11 +131,30 @@ export default function AccommodationForm(form: formProps) {
   };
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7 p-7">
+      {(form.saveAndExit || form.saveAndExit == undefined) && (
+        <div className="relative mt-[-1.75rem] pb-7">
+          <Button
+            variant={"outline"}
+            className="absolute top-3 right-0"
+            disabled={isSubmitting}
+            onClick={async () => {
+              const isFormValid = await trigger();
+              if (isFormValid) {
+                setTimeout(() => {
+                  push("/hosting");
+                }, 100);
+              }
+            }}
+          >
+            Save & exit
+          </Button>
+        </div>
+      )}
       <div className="flex flex-col gap-3">
         <p className="font-bold text-lg">Number of guests</p>
         <p className="font-normal text-sm">
@@ -240,6 +265,11 @@ export default function AccommodationForm(form: formProps) {
           Save and continue
         </Button>
       </div>
+      {Object.keys(errors).length > 0 && (
+        <p className="text-red-500 font-medium animate-pulse mt-[-2rem] mx-auto">
+          Fill out all required details to proceed
+        </p>
+      )}
     </form>
   );
 }

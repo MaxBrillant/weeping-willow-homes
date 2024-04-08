@@ -17,7 +17,9 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import MoreIcon from "../../icons/search.svg";
+import { useRouter } from "next/navigation";
+import { FiMoreVertical } from "react-icons/fi";
+import Loading from "../loading";
 
 type schema = z.infer<typeof PhotosFormSchema>;
 
@@ -25,6 +27,7 @@ type formProps = {
   backFunctions: (() => void | undefined)[];
   submitFunctions: (() => void | undefined)[];
   homeId: number | null;
+  saveAndExit?: boolean;
 };
 
 type defaultValuesType = {
@@ -38,11 +41,14 @@ export default function PhotosForm(form: formProps) {
     handleSubmit,
     watch,
     setValue,
+    trigger,
     formState: { errors },
   } = useForm<schema>({
     resolver: zodResolver(PhotosFormSchema),
     mode: "onChange",
   });
+
+  const { push } = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -228,11 +234,30 @@ export default function PhotosForm(form: formProps) {
   };
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7 p-7">
+      {(form.saveAndExit || form.saveAndExit == undefined) && (
+        <div className="relative mt-[-1.75rem] pb-7">
+          <Button
+            variant={"outline"}
+            className="absolute top-3 right-0"
+            disabled={isSubmitting}
+            onClick={async () => {
+              const isFormValid = await trigger();
+              if (isFormValid) {
+                setTimeout(() => {
+                  push("/hosting");
+                }, 100);
+              }
+            }}
+          >
+            Save & exit
+          </Button>
+        </div>
+      )}
       {photoCategories.map((category, index) => {
         return (
           <div key={index} className="flex flex-col gap-3">
@@ -252,8 +277,8 @@ export default function PhotosForm(form: formProps) {
                     />
                     <DropdownMenu>
                       <DropdownMenuTrigger className="absolute top-1 right-1 ">
-                        <button className="flex flex-col items-center justify-center bg-white opacity-90 rounded-full">
-                          <MoreIcon className="w-4 h-4 m-1 items-center" />
+                        <button className="flex flex-col p-1 items-center justify-center bg-white opacity-90 rounded-full">
+                          <FiMoreVertical className="w-4 h-4 items-center" />
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
@@ -351,10 +376,12 @@ export default function PhotosForm(form: formProps) {
                     const filePaths = Array.from(e.target.files).map((file) =>
                       URL.createObjectURL(file)
                     );
-                    setValue(category.validationString, [
-                      ...(watch(category.validationString) as string[]),
-                      ...filePaths,
-                    ]);
+                    watch(category.validationString) != undefined
+                      ? setValue(category.validationString, [
+                          ...(watch(category.validationString) as string[]),
+                          ...filePaths,
+                        ])
+                      : setValue(category.validationString, [...filePaths]);
 
                     const files = Array.from(e.target.files).map(
                       (file) => file
@@ -471,6 +498,11 @@ export default function PhotosForm(form: formProps) {
           Save and continue
         </Button>
       </div>
+      {Object.keys(errors).length > 0 && (
+        <p className="text-red-500 font-medium animate-pulse mt-[-2rem] mx-auto">
+          Provide out all required photos to proceed
+        </p>
+      )}
     </form>
   );
 }

@@ -7,7 +7,12 @@ type returnedHomeDetailsType = Array<{
   id: number;
   title: string;
   description: string;
-  type_of_property: "house" | "apartment";
+  type_of_property:
+    | "penthouse"
+    | "townhouse"
+    | "condominium"
+    | "bungalow"
+    | "apartment";
   status: "verified";
   accommodation_information: {
     guests: number;
@@ -39,7 +44,18 @@ type returnedHomeDetailsType = Array<{
         }
       ];
   home_location: {
-    city: "Nairobi, Kenya" | "Mombasa, Kenya";
+    city:
+      | "Nairobi, Kenya"
+      | "Mombasa, Kenya"
+      | "Kisumu, Kenya"
+      | "Nakuru, Kenya"
+      | "Nanyuki, Kenya"
+      | "Naivasha, Kenya"
+      | "Eldoret, Kenya"
+      | "Malindi, Kenya"
+      | "Tsavo, Kenya"
+      | "Watamu, Kenya"
+      | "Maasai Mara, Kenya";
     longitude: number;
     latitude: number;
   };
@@ -64,7 +80,7 @@ type returnedHomeDetailsType = Array<{
     full_name: string;
     profile_picture: string;
     languages: string[];
-    city_address: "Nairobi, Kenya" | "Mombasa, Kenya";
+    city_address: string;
     is_identity_verified: boolean;
   };
   house_rules_and_information: {
@@ -81,11 +97,27 @@ export type homeDetailsType = {
   id: number;
   title: string;
   description: string;
-  city: "Nairobi, Kenya" | "Mombasa, Kenya";
+  city:
+    | "Nairobi, Kenya"
+    | "Mombasa, Kenya"
+    | "Kisumu, Kenya"
+    | "Nakuru, Kenya"
+    | "Nanyuki, Kenya"
+    | "Naivasha, Kenya"
+    | "Eldoret, Kenya"
+    | "Malindi, Kenya"
+    | "Tsavo, Kenya"
+    | "Watamu, Kenya"
+    | "Maasai Mara, Kenya";
   checkOutDate: Date;
   longitude: number;
   latitude: number;
-  typeOfProperty: "house" | "apartment";
+  typeOfProperty:
+    | "penthouse"
+    | "townhouse"
+    | "condominium"
+    | "bungalow"
+    | "apartment";
   numberOfGuests: number;
   numberOfBedrooms: number;
   numberOfBeds: number;
@@ -107,7 +139,7 @@ export type homeDetailsType = {
     fullName: string;
     profilePicture: string;
     languages: string[];
-    cityAddress: "Nairobi, Kenya" | "Mombasa, Kenya";
+    cityAddress: string;
     isIdentityVerified: boolean;
   };
   houseRules: {
@@ -256,7 +288,7 @@ export async function getHomePhotos(id: number) {
         "home_photos(sleeping_space, living_space, kitchen, bathrooms, building, outdoors, additional)"
     )
     .eq("id", id)
-    .eq("status", "verified")
+    .neq("status", "in-progress")
     .limit(1)
     .returns<returnedHomePhotos>();
 

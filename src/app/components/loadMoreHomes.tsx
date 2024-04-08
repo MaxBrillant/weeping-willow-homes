@@ -1,10 +1,10 @@
 "use client";
 import { getListOfHomes, homesType } from "@/api/fetch/fetchHomes";
 import { useState } from "react";
-import Home from "./home";
 import { getUrlSearchFilters } from "@/api/fetch/urlSearchFilters";
 import { URLSearchParams } from "url";
 import { Button } from "@/components/ui/button";
+import Home from "./home";
 
 type PropsType = {
   initialData: homesType;

@@ -2,7 +2,19 @@ import { z } from "zod";
 
 export const FilterParamsSchema = z
   .object({
-    city: z.enum(["Nairobi, Kenya", "Mombasa, Kenya"]),
+    city: z.enum([
+      "Nairobi, Kenya",
+      "Mombasa, Kenya",
+      "Kisumu, Kenya",
+      "Nakuru, Kenya",
+      "Nanyuki, Kenya",
+      "Naivasha, Kenya",
+      "Eldoret, Kenya",
+      "Malindi, Kenya",
+      "Tsavo, Kenya",
+      "Watamu, Kenya",
+      "Maasai Mara, Kenya",
+    ]),
     startDate: z.date(),
     duration: z.number().max(12).min(1),
     currency: z.enum(["US Dollars", "Kenyan Shillings"]).optional(),

@@ -7,7 +7,12 @@ type returnedHostHomeDetailsType = Array<{
   id: number;
   title: string;
   description: string;
-  type_of_property: "house" | "apartment";
+  type_of_property:
+    | "penthouse"
+    | "townhouse"
+    | "condominium"
+    | "bungalow"
+    | "apartment";
   property_size: number | null;
   status: "in-progress" | "completed" | "verified";
   accommodation_information: {
@@ -23,11 +28,23 @@ type returnedHostHomeDetailsType = Array<{
       facilities_and_features: {
         title: string;
         icon_url: string;
+        type: "facility" | "safety" | "feature";
       };
     }
   ];
   home_location: {
-    city: "Nairobi, Kenya" | "Mombasa, Kenya";
+    city:
+      | "Nairobi, Kenya"
+      | "Mombasa, Kenya"
+      | "Kisumu, Kenya"
+      | "Nakuru, Kenya"
+      | "Nanyuki, Kenya"
+      | "Naivasha, Kenya"
+      | "Eldoret, Kenya"
+      | "Malindi, Kenya"
+      | "Tsavo, Kenya"
+      | "Watamu, Kenya"
+      | "Maasai Mara, Kenya";
     longitude: number;
     latitude: number;
   };
@@ -63,10 +80,26 @@ export type homeDetailsType = {
   title: string;
   description: string;
   propertySize: number | null;
-  city: "Nairobi, Kenya" | "Mombasa, Kenya";
+  city:
+    | "Nairobi, Kenya"
+    | "Mombasa, Kenya"
+    | "Kisumu, Kenya"
+    | "Nakuru, Kenya"
+    | "Nanyuki, Kenya"
+    | "Naivasha, Kenya"
+    | "Eldoret, Kenya"
+    | "Malindi, Kenya"
+    | "Tsavo, Kenya"
+    | "Watamu, Kenya"
+    | "Maasai Mara, Kenya";
   longitude: number;
   latitude: number;
-  typeOfProperty: "house" | "apartment";
+  typeOfProperty:
+    | "penthouse"
+    | "townhouse"
+    | "condominium"
+    | "bungalow"
+    | "apartment";
   numberOfGuests: number;
   numberOfBedrooms: number;
   numberOfBeds: number;
@@ -82,6 +115,7 @@ export type homeDetailsType = {
     id: number;
     title: string;
     iconUrl: string;
+    type: "facility" | "safety" | "feature";
   }[];
   houseRules: {
     eventsAllowed: boolean | null;
@@ -109,7 +143,7 @@ export default async function getHostHomeDetails(homeId: number) {
         "status, " +
         "accommodation_information(guests, bedrooms, beds, private_bathrooms, shared_bathrooms), " +
         "home_photos(id, cover_photo, sleeping_space, living_space, kitchen, bathrooms, building), " +
-        "home_facilities_and_features(id, facilities_and_features(title, icon_url)), " +
+        "home_facilities_and_features(id, facilities_and_features(title, icon_url, type)), " +
         "home_location(city, longitude, latitude), " +
         "home_fees(currency, monthly_fee, first_time_fee, first_time_fee_description, booking_option), " +
         "user_profile!inner(user_id), " +
@@ -117,6 +151,7 @@ export default async function getHostHomeDetails(homeId: number) {
     )
     .eq("user_profile.user_id", userId)
     .eq("id", homeId)
+    .neq("status", "in-progress")
     .limit(1)
     .returns<returnedHostHomeDetailsType>();
 
@@ -167,6 +202,7 @@ export default async function getHostHomeDetails(homeId: number) {
       id: facility.id,
       title: facility.facilities_and_features.title,
       iconUrl: facility.facilities_and_features.icon_url,
+      type: facility.facilities_and_features.type,
     })),
     houseRules: {
       eventsAllowed: data[0].house_rules_and_information.events_allowed,

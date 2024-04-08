@@ -6,7 +6,12 @@ import { cookies } from "next/headers";
 type returnedDefaultValuesType = Array<{
   id: number;
   title: string;
-  type_of_property: "house" | "apartment";
+  type_of_property:
+    | "penthouse"
+    | "townhouse"
+    | "condominium"
+    | "bungalow"
+    | "apartment";
   description: string;
   property_size: number | null;
 }>;
@@ -14,7 +19,12 @@ type returnedDefaultValuesType = Array<{
 type defaultValuesType = {
   id: number;
   title: string;
-  typeOfProperty: "house" | "apartment";
+  typeOfProperty:
+    | "penthouse"
+    | "townhouse"
+    | "condominium"
+    | "bungalow"
+    | "apartment";
   description: string;
   propertySize: number | null;
 };

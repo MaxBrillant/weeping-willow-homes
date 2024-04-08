@@ -39,12 +39,14 @@ export default async function getFacilitiesAndFeaturesDefaultValues(
         "description, " +
         "icon_url, " +
         "type, " +
+        "position, " +
         "home_facilities_and_features!left(id, " +
         "homes!inner(id, user_profile!inner(user_id)))"
     )
     .eq("home_facilities_and_features.homes.user_profile.user_id", userId)
     .eq("home_facilities_and_features.homes.id", homeId)
     .limit(1, { referencedTable: "home_facilities_and_features.homes" })
+    .order("position", { ascending: true })
     .returns<returnedDefaultValuesType>();
 
   if (error) {

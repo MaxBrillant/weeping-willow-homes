@@ -255,7 +255,7 @@ function BookingPage(stay: {
                   <div className="flex flex-row w-full gap-7">
                     <div className="w-full">
                       <p>Initial Setup Fee</p>
-                      {stay.firstTimeFeeDescription && (
+                      {stay.firstTimeFee && stay.firstTimeFeeDescription && (
                         <p>Description: {stay.firstTimeFeeDescription}</p>
                       )}
                     </div>
