@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
-import BackButton from "@/app/components/backButton";
 import { Progress } from "@/components/ui/progress";
 import HomeInformationForm from "@/app/homeForm/homeInformationForm";
 import AccommodationForm from "@/app/homeForm/accommodationForm";
@@ -16,6 +15,8 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import UserHasProfile from "@/api/fetch/checkIfUserHasProfile";
+import Image from "next/image";
+import Loading from "@/app/loading";
 
 export default function BecomeAHost({
   params,
@@ -75,20 +76,23 @@ export default function BecomeAHost({
     handleSignedOutUserAndCheckForUserAccess();
   }, []);
 
+  useEffect(() => {
+    push("/become-a-host/" + params.homeId + "?step=" + step);
+  }, [step]);
+
   if (!hasAccess && !isLoading) {
     return <p>{`You don't have access.`}</p>;
   }
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
   return (
     <div className="min-h-screen flex flex-col">
       <div className="sticky top-0 z-50 w-full bg-white py-2">
         <div className="flex flex-row gap-5 py-3 border-b-2">
-          <BackButton />
           <p className="font-bold text-xl">
-            Turn Your Property into a Weeping Willow Home
+            Turn Your Property into a Willow Home
           </p>
         </div>
         <Progress
@@ -101,9 +105,9 @@ export default function BecomeAHost({
           <div id="step-1">
             <div
               id="step-1"
-              className="flex flex-col w-full border border-black mt-10"
+              className="flex flex-col w-full border border-black mt-10 rounded-2xl"
             >
-              <p className="bg-gray-200 p-3 font-medium">
+              <p className="bg-slate-200 p-5 font-medium border-b border-black rounded-t-2xl">
                 Provide essential details about your property by specifying the
                 type of property, crafting a compelling title, and providing a
                 detailed yet succinct description.
@@ -122,8 +126,8 @@ export default function BecomeAHost({
         {step === 1 && (
           <div id="step-2">
             <div className="m-auto h-10 w-1 bg-slate-500"></div>
-            <div className="flex flex-col w-full border border-black">
-              <p className="bg-gray-200 p-3 font-medium">
+            <div className="flex flex-col w-full border border-black rounded-2xl">
+              <p className="bg-slate-200 p-5 font-medium border-b border-black rounded-t-2xl">
                 Provide details about the specifics of your accommodation. Clear
                 and accurate accommodation information helps guests assess
                 suitability and plan their stay accordingly.
@@ -140,13 +144,14 @@ export default function BecomeAHost({
                 homeId={params.homeId}
               />
             </div>
+            <div className="m-auto h-10 w-1 bg-slate-500"></div>
           </div>
         )}
         {step === 2 && (
           <div id="step-3">
             <div className="m-auto h-10 w-1 bg-slate-500"></div>
-            <div className="flex flex-col w-full border border-black">
-              <p className="bg-gray-200 p-3 font-medium">
+            <div className="flex flex-col w-full border border-black rounded-2xl">
+              <p className="bg-slate-200 p-5 font-medium border-b border-black rounded-t-2xl">
                 Provide details about the specifics of your accommodation. Clear
                 and accurate accommodation information helps guests assess
                 suitability and plan their stay accordingly.
@@ -163,13 +168,14 @@ export default function BecomeAHost({
                 homeId={params.homeId}
               />
             </div>
+            <div className="m-auto h-10 w-1 bg-slate-500"></div>
           </div>
         )}
         {step === 3 && (
           <div id="step-4">
             <div className="m-auto h-10 w-1 bg-slate-500"></div>
-            <div className="flex flex-col w-full border border-black">
-              <p className="bg-gray-200 p-3 font-medium">
+            <div className="flex flex-col w-full border border-black rounded-2xl">
+              <p className="bg-slate-200 p-5 font-medium border-b border-black rounded-t-2xl">
                 Upload some images of your home by category.
               </p>
               <PhotosForm
@@ -184,14 +190,15 @@ export default function BecomeAHost({
                 homeId={params.homeId}
               />
             </div>
+            <div className="m-auto h-10 w-1 bg-slate-500"></div>
           </div>
         )}
         {step === 4 && (
           <div id="step-5">
             <div className="m-auto h-10 w-1 bg-slate-500"></div>
-            <div className="flex flex-col w-full border border-black">
-              <p className="bg-gray-200 p-3 font-medium">
-                List the Features and Facilities that make your property unique
+            <div className="flex flex-col w-full border border-black rounded-2xl">
+              <p className="bg-slate-200 p-5 font-medium border-b border-black rounded-t-2xl">
+                List the Facilities and Features that make your property unique
                 and desirable.
               </p>
               <FacilitiesAndFeaturesForm
@@ -206,13 +213,14 @@ export default function BecomeAHost({
                 homeId={params.homeId}
               />
             </div>
+            <div className="m-auto h-10 w-1 bg-slate-500"></div>
           </div>
         )}
         {step === 5 && (
           <div id="step-6">
             <div className="m-auto h-10 w-1 bg-slate-500"></div>
-            <div className="flex flex-col w-full border border-black">
-              <p className="bg-gray-200 p-3 font-medium">
+            <div className="flex flex-col w-full border border-black rounded-2xl">
+              <p className="bg-slate-200 p-5 font-medium border-b border-black rounded-t-2xl">
                 Outline the financial aspects of renting your property.
               </p>
               <FeesForm
@@ -227,13 +235,14 @@ export default function BecomeAHost({
                 homeId={params.homeId}
               />
             </div>
+            <div className="m-auto h-10 w-1 bg-slate-500"></div>
           </div>
         )}
         {step === 6 && (
           <div id="step-7">
             <div className="m-auto h-10 w-1 bg-slate-500"></div>
-            <div className="flex flex-col w-full border border-black">
-              <p className="bg-gray-200 p-3 font-medium">
+            <div className="flex flex-col w-full border border-black rounded-2xl">
+              <p className="bg-slate-200 p-5 font-medium border-b border-black rounded-t-2xl">
                 Outline the guidelines and expectations for guests during their
                 stay at your property. Establishing clear house rules helps
                 ensure a comfortable and harmonious experience for all.
@@ -250,20 +259,41 @@ export default function BecomeAHost({
                 homeId={params.homeId}
               />
             </div>
+            <div className="m-auto h-10 w-1 bg-slate-500"></div>
           </div>
         )}
         <Dialog open={isCompleted}>
-          <DialogContent className="sm:max-w-[425px] max-h-[500px] overflow-auto">
+          <DialogContent className="w-full h-full overflow-auto">
             <div className="flex flex-col gap-5 p-5 items-center justify-center">
-              <p>Welcome on board</p>
-              <p>You have successfully completed the creation of this home.</p>
-              <p>{`What's next?`}</p>
-              <p>
-                {`We will get in touch with you via call or email, and initiate
-                the verification process of your home. We want to ensure a safe
-                and luxurious experience to your future guests, and that's why
-                your home will only be available for booking after being
-                verified by us.`}
+              <div className="grid grid-cols-2">
+                <Image
+                  src="/confetti-1.png"
+                  alt="confetti"
+                  width={300}
+                  height={300}
+                  priority
+                  loading="eager"
+                  className="w-full aspect-square object-cover"
+                />
+                <Image
+                  src="/confetti-2.png"
+                  alt="confetti"
+                  width={300}
+                  height={300}
+                  priority
+                  loading="eager"
+                  className="w-full aspect-square object-cover"
+                />
+              </div>
+              <p className="text-5xl font-bold text-center">Welcome on board</p>
+              <p className="font-medium text-lg">
+                {`You've just taken a significant step towards making your
+                property a cherished part of someone's journey. Here's to the
+                next chapter of your home's story!`}
+              </p>
+              <p className="text-2xl font-bold">{`What's next?`}</p>
+              <p className="font-medium text-lg">
+                {`We will reach out to you via phone or email to begin the verification process of your property. Our goal is to guarantee a secure and opulent experience for your future guests, which is why your property will only be available for booking following our verification.`}
               </p>
               <Link href={"/hosting"}>
                 <Button>Go to Hosting</Button>

@@ -9,7 +9,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Willow Homes",
-  description: "Your destination for long-term luxurious stays",
+  description:
+    "Premium, top-tier accommodations tailored for long-term residency.",
 };
 
 export default async function RootLayout({

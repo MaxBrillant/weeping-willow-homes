@@ -10,7 +10,7 @@ type returnedProfiletype = Array<{
   full_name: string;
   profile_picture: string;
   languages: string[];
-  city_address: "Nairobi, Kenya" | "Mombasa, Kenya";
+  city_address: string;
   is_identity_verified: boolean;
 }>;
 
@@ -21,7 +21,7 @@ type profileType = {
   bio: string;
   profilePicture: string;
   languages: string[];
-  cityAddress: "Nairobi, Kenya" | "Mombasa, Kenya";
+  cityAddress: string;
   isIdentityVerified: boolean;
 };
 export default async function getUserProfile(userId: number) {

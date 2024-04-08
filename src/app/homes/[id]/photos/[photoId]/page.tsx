@@ -87,10 +87,10 @@ export default function PhotoCarousel({
 
   return (
     <div className="flex flex-col h-screen border">
-      <div className="flex flex-row gap-5 py-3 border-b-2">
+      <div className="py-3 border-b-2">
         <BackButton />
-        <p className="w-full font-bold text-2xl text-center">
-          {current}/{photos.length}
+        <p className="absolute w-full top-4 font-semibold text-lg text-center">
+          {current} / {photos.length}
         </p>
       </div>
       <Carousel

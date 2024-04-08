@@ -1,4 +1,5 @@
 "use server";
+import { SendEmail } from "@/email templates/sendEmail";
 import {
   SupabaseClient,
   createServerComponentClient,
@@ -54,6 +55,14 @@ export async function addOrUpdateHouseRulesAndInformation(
       );
 
       addHouseRulesAndInformationToHome(data[0].id, formData.homeId, supabase);
+
+      await SendEmail({
+        type: "home-completion",
+        email: (await supabase.auth.getUser()).data.user?.email as string,
+        profileLink: "",
+        homeTitle: "",
+        homeLink: "https://www.willow.africa/hosting/homes/" + formData.homeId,
+      });
     }
   } else {
     const { error } = await supabase

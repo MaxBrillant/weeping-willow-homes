@@ -5,7 +5,13 @@ export const PropertyFormSchema = z.object({
     .string()
     .min(10, "The title must have at least 10 characters")
     .max(50, "The title must must have a maximum of 50 characters"),
-  typeOfProperty: z.enum(["house", "apartment"]),
+  typeOfProperty: z.enum([
+    "penthouse",
+    "townhouse",
+    "condominium",
+    "bungalow",
+    "apartment",
+  ]),
   description: z
     .string()
     .min(30, "The description must have at least 30 characters")
@@ -44,7 +50,18 @@ export const AccommodationFormSchema = z.object({
 
 export const LocationFormSchema = z
   .object({
-    city: z.enum(["Nairobi, Kenya", "Mombasa, Kenya"]),
+    city: z.enum([
+      "Nairobi, Kenya",
+      "Mombasa, Kenya",
+      "Kisumu, Kenya",
+      "Nakuru, Kenya",
+      "Nanyuki, Kenya",
+      "Naivasha, Kenya",
+      "Eldoret, Kenya",
+      "Malindi, Kenya",
+      "Tsavo, Kenya",
+      "Watamu, Kenya",
+    ]),
     streetAddress: z
       .string()
       .min(15, "Write a complete address")

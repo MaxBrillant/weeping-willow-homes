@@ -1,6 +1,7 @@
 import Image from "next/image";
 import HomeCarousel from "./homeCarousel";
 import Link from "next/link";
+import { FormatCurrency } from "@/formatCurrency";
 
 type homeProps = {
   id: number;
@@ -81,7 +82,9 @@ export default function Home(home: homeProps) {
           <p className="font-extrabold text-lg">
             {home.currency.toUpperCase()}
           </p>
-          <p className="font-extrabold text-lg">{home.monthlyFee}</p>
+          <p className="font-extrabold text-lg">
+            {FormatCurrency(home.monthlyFee)}
+          </p>
           <p>/month</p>
         </div>
       </Link>

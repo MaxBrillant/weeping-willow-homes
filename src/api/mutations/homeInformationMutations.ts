@@ -1,4 +1,5 @@
 "use server";
+import { SendEmail } from "@/email templates/sendEmail";
 import {
   SupabaseClient,
   createServerComponentClient,
@@ -9,7 +10,12 @@ type formDataType = {
   id: number | null;
   title: string;
   description: string;
-  typeOfProperty: "house" | "apartment";
+  typeOfProperty:
+    | "penthouse"
+    | "townhouse"
+    | "condominium"
+    | "bungalow"
+    | "apartment";
   propertySize: number | null;
 };
 
@@ -17,7 +23,12 @@ type returnedDataType = Array<{
   id: number;
   title: string;
   description: string;
-  type_of_property: "house" | "apartment";
+  type_of_property:
+    | "penthouse"
+    | "townhouse"
+    | "condominium"
+    | "bungalow"
+    | "apartment";
   property_size: number | null;
 }>;
 
@@ -47,6 +58,15 @@ export async function createOrUpdateHome(formData: formDataType) {
     }
     if (data) {
       console.log("Home of ID: " + data[0].id + " was successfully created");
+
+      await SendEmail({
+        type: "home-creation",
+        email: (await supabase.auth.getUser()).data.user?.email as string,
+        profileLink: "",
+        homeTitle: formData.title,
+        homeLink: "",
+      });
+
       return data[0].id;
     }
   } else {

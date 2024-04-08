@@ -13,6 +13,9 @@ import { ProfileFormSchema } from "@/validation/userProfileValidation";
 import getUserProfileDefaultValues from "@/api/defaultValues/userProfileForm";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { CreateOrUpdateUserProfile } from "@/api/mutations/createOrUpdateUserProfile";
+import { Separator } from "@/components/ui/separator";
+import Loading from "../loading";
+import { SendEmail } from "@/email templates/sendEmail";
 
 type schema = z.infer<typeof ProfileFormSchema>;
 
@@ -102,18 +105,22 @@ export default function ProfileForm(form: formProps) {
   }, [form]);
 
   useEffect(() => {
-    setValue(
-      "languages",
-      selectedLanguages.map((language) => {
-        if (language === 0) {
-          return "English";
-        } else if (language === 1) {
-          return "Swahili";
-        } else {
-          return "French";
-        }
-      })
-    );
+    if (selectedLanguages.length > 0) {
+      setValue(
+        "languages",
+        selectedLanguages.map((language) => {
+          if (language === 0) {
+            return "English";
+          } else if (language === 1) {
+            return "Swahili";
+          } else {
+            return "French";
+          }
+        })
+      );
+    } else {
+      setValue("languages", []);
+    }
   }, [selectedLanguages]);
 
   useEffect(() => {
@@ -152,17 +159,22 @@ export default function ProfileForm(form: formProps) {
       submitFunction();
     });
     setIsSubmitting(false);
+
+    await SendEmail({
+      type: "profile-creation",
+      email: (await supabase.auth.getUser()).data.user?.email as string,
+      profileLink: "https://www.willow.africa/account",
+      homeTitle: "",
+      homeLink: "",
+    });
   };
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-10 p-5"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7 p-7">
       <SelfieCamera
         setProfilePhoto={setProfilePhoto}
         defaultPhoto={watch("profilePhoto")}
@@ -172,8 +184,9 @@ export default function ProfileForm(form: formProps) {
           {errors.profilePhoto.message}
         </p>
       )}
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Full name</p>
+      <Separator />
+      <div className="flex flex-col gap-1">
+        <p className="font-bold text-lg">Full name</p>
         <Input
           {...register("fullName")}
           defaultValue={defaultValues?.fullName}
@@ -185,27 +198,13 @@ export default function ProfileForm(form: formProps) {
           </p>
         )}
       </div>
-
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">In which city do you live?</p>
-        <Input
-          {...register("cityAddress")}
-          defaultValue={defaultValues?.cityAddress}
-          placeholder="Nairobi"
-        />
-        {errors.cityAddress && (
-          <p className="text-red-500 font-semibold">
-            {errors.cityAddress.message}
-          </p>
-        )}
-      </div>
-
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Phone number</p>
-        <p>
-          Write your phone number including the country code. Please insure the
-          phone number is valid as it will be used for later communication with
-          hosts, guests, and us.
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Phone number</p>
+        <p className="font-normal text-sm">
+          Provide your phone number, including the country code. Please ensure
+          the phone number is valid, as it will be used for future
+          communications with hosts, guests, and our team.
         </p>
         <Input
           {...register("phoneNumber")}
@@ -218,8 +217,26 @@ export default function ProfileForm(form: formProps) {
           </p>
         )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Languages spoken</p>
+      <Separator />
+      <div className="flex flex-col gap-1">
+        <p className="font-bold text-lg">
+          What city/town are you currently living in?
+        </p>
+        <Input
+          {...register("cityAddress")}
+          defaultValue={defaultValues?.cityAddress}
+          placeholder="Nairobi"
+        />
+        {errors.cityAddress && (
+          <p className="text-red-500 font-semibold">
+            {errors.cityAddress.message}
+          </p>
+        )}
+      </div>
+
+      <Separator />
+      <div className="flex flex-col gap-1">
+        <p className="font-bold text-lg">What languages are you fluent in?</p>
         <OptionContainer
           options={["English", "Swahili", "French"]}
           multipleSelectionEnabled={true}
@@ -232,9 +249,13 @@ export default function ProfileForm(form: formProps) {
           </p>
         )}
       </div>
-      <div className="flex flex-col">
-        <p className="font-semibold text-lg">Bio</p>
-        <p>Tell us about yourself, your hobbies, and some facts about you</p>
+      <Separator />
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-lg">Bio</p>
+        <p className="font-normal text-sm">
+          Share a bit about your background, your interests, and some
+          interesting facts about yourself.
+        </p>
         <Textarea
           {...register("bio")}
           defaultValue={defaultValues?.bio}
@@ -256,6 +277,11 @@ export default function ProfileForm(form: formProps) {
           Save and continue
         </Button>
       </div>
+      {Object.keys(errors).length > 0 && (
+        <p className="text-red-500 font-medium animate-pulse mt-[-2rem] mx-auto">
+          Fill out all required details to proceed
+        </p>
+      )}
     </form>
   );
 }

@@ -244,8 +244,8 @@ function BookingPage(stay: {
               <div className="flex flex-col gap-3 text-sm font-medium">
                 <div className="flex flex-row w-full gap-7">
                   <p className="w-full">
-                    Monthly fee (paid each month on {stay.date?.toDateString()})
-                    TO BE CHANGED WITH TEMPORAL API
+                    Monthly Rental Fee (paid each month on{" "}
+                    {stay.date?.toDateString()}) TO BE CHANGED WITH TEMPORAL API
                   </p>
                   <p className="text-nowrap font-semibold text-base">
                     {stay.currency.toUpperCase()} {stay.monthlyFee}
@@ -254,8 +254,8 @@ function BookingPage(stay: {
                 {stay.firstTimeFee && (
                   <div className="flex flex-row w-full gap-7">
                     <div className="w-full">
-                      <p>First time fee</p>
-                      {stay.firstTimeFeeDescription && (
+                      <p>Initial Setup Fee</p>
+                      {stay.firstTimeFee && stay.firstTimeFeeDescription && (
                         <p>Description: {stay.firstTimeFeeDescription}</p>
                       )}
                     </div>
@@ -272,7 +272,8 @@ function BookingPage(stay: {
                 </div>
               </div>
             </div>
-            <PaymentForm />
+            {/* <PaymentForm /> */}
+            <p>Booking is closed for now.</p>
           </div>
         </div>
       </DialogContent>

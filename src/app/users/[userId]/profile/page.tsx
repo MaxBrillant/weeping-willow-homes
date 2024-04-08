@@ -61,7 +61,7 @@ export default async function Profile({
   return (
     <>
       <BackButton />
-      <div className="flex flex-col gap-5 p-5">
+      <div className="flex flex-col gap-7 p-7">
         <div className="w-full flex flex-col gap-5 p-7 rounded-3xl bg-white drop-shadow-2xl">
           <Image
             src={userProfile.profilePicture}
@@ -70,24 +70,28 @@ export default async function Profile({
             alt="Profile picture"
             className="aspect-square object-cover rounded-full"
           />
-          <div>
-            <p className="font-semibold text-lg">{userProfile.fullName}</p>
-            <p>{userProfile.bio}</p>
+          <div className="space-y-2">
+            <p className="font-bold text-3xl">{userProfile.fullName}</p>
+            <p className="font-medium opacity-80">{userProfile.bio}</p>
           </div>
         </div>
-        <div>
-          <p>Lives in {userProfile.cityAddress}</p>
-          <p>{formatLanguages(userProfile.languages)}</p>
+        <div className="space-y-1 relative">
+          <p className="font-medium">Lives in {userProfile.cityAddress}</p>
+          <p className="font-medium">
+            {formatLanguages(userProfile.languages)}
+          </p>
           {userProfile.isIdentityVerified && (
             <p className="font-semibold">
               {`This user's identity has been verified`}
             </p>
           )}
           {activeUserId && activeUserId === userProfile.userId && (
-            <EditPopup
-              title="Edit profile"
-              form={<ProfileForm submitFunctions={[]}></ProfileForm>}
-            ></EditPopup>
+            <div className="absolute top-0 right-3">
+              <EditPopup
+                title="Edit profile"
+                form={<ProfileForm submitFunctions={[]}></ProfileForm>}
+              ></EditPopup>
+            </div>
           )}
         </div>
       </div>

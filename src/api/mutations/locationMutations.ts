@@ -8,7 +8,18 @@ import { cookies } from "next/headers";
 type formDataType = {
   locationId: number | null;
   homeId: number;
-  city: "Nairobi, Kenya" | "Mombasa, Kenya";
+  city:
+    | "Nairobi, Kenya"
+    | "Mombasa, Kenya"
+    | "Kisumu, Kenya"
+    | "Nakuru, Kenya"
+    | "Nanyuki, Kenya"
+    | "Naivasha, Kenya"
+    | "Eldoret, Kenya"
+    | "Malindi, Kenya"
+    | "Tsavo, Kenya"
+    | "Watamu, Kenya"
+    | "Maasai Mara, Kenya";
   longitude: number;
   latitude: number;
   streetAddress: string;
@@ -17,7 +28,18 @@ type formDataType = {
 
 type returnedDataType = Array<{
   id: number;
-  city: "Nairobi, Kenya" | "Mombasa, Kenya";
+  city:
+    | "Nairobi, Kenya"
+    | "Mombasa, Kenya"
+    | "Kisumu, Kenya"
+    | "Nakuru, Kenya"
+    | "Nanyuki, Kenya"
+    | "Naivasha, Kenya"
+    | "Eldoret, Kenya"
+    | "Malindi, Kenya"
+    | "Tsavo, Kenya"
+    | "Watamu, Kenya"
+    | "Maasai Mara, Kenya";
   longitude: number;
   latitude: number;
   street_address: string;

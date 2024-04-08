@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { FcGoogle } from "react-icons/fc";
 
 export default function SignInButton({ url }: { url: string }) {
   const handleSignIn = async () => {
@@ -17,5 +18,10 @@ export default function SignInButton({ url }: { url: string }) {
       },
     });
   };
-  return <Button onClick={() => handleSignIn()}>Sign in with Google</Button>;
+  return (
+    <Button variant={"outline"} onClick={() => handleSignIn()}>
+      <FcGoogle className="w-6 h-6 mr-2" />
+      Continue with Google
+    </Button>
+  );
 }

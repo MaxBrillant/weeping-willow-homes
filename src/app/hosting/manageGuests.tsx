@@ -5,6 +5,7 @@ import { cookies, headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { FaUserAltSlash } from "react-icons/fa";
 
 export default async function ManageGuests() {
   const cookieStore = cookies();
@@ -31,8 +32,10 @@ export default async function ManageGuests() {
 
   if (hostGuests.length === 0) {
     return (
-      <div className="flex flex-col gap-5 p-3 items-center">
-        <p>{`You don't have any guests...yet.`}</p>
+      <div className="flex flex-col gap-5 p-10 items-center">
+        <FaUserAltSlash className="w-32 h-32" />
+        <p className="font-medium text-lg">{`You don't have any guests...yet.`}</p>
+        <p>{`We will notify you once guests book stays with you.`}</p>
       </div>
     );
   }

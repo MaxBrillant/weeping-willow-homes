@@ -130,6 +130,7 @@ export default async function StayDetails({
                 <Map
                   long={stayDetails.location.longitude}
                   lat={stayDetails.location.latitude}
+                  scrollToZoom={false}
                 />
                 <ExpandMap
                   longitude={stayDetails.location.longitude}
