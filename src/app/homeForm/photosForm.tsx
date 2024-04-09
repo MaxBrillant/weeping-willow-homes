@@ -20,6 +20,9 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { FiMoreVertical } from "react-icons/fi";
 import Loading from "../loading";
+import Compressor from "compressorjs";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { randomUUID } from "crypto";
 
 type schema = z.infer<typeof PhotosFormSchema>;
 
@@ -180,15 +183,90 @@ export default function PhotosForm(form: formProps) {
     },
   ];
 
+  function compressImage(file: File): Promise<File> {
+    return new Promise((resolve, reject) => {
+      new Compressor(file, {
+        quality: 0.6, // Adjust the desired image quality (0.0 - 1.0)
+        // maxWidth: 700, // Adjust the maximum width of the compressed image
+        // maxHeight: 700, // Adjust the maximum height of the compressed image
+        success: (result) => {
+          resolve(new File([result], file.name, { type: result.type }));
+        },
+        error: (error) => {
+          reject(error);
+        },
+      });
+    });
+  }
+
+  async function compressFiles(files: File[]): Promise<File[]> {
+    const compressedFiles: File[] = [];
+    for (const file of files) {
+      const compressedFile = await compressImage(file);
+      compressedFiles.push(compressedFile);
+    }
+    return compressedFiles;
+  }
+
   const onSubmit = async (data: schema) => {
     setIsSubmitting(true);
+    const supabase = createClientComponentClient();
     const { files, paths } = newPhotos;
 
     console.log(photosToDelete);
     const formData = new FormData();
-    const appendAllFiles = await Promise.all(
-      files.map(async (file) => {
-        formData.append("files", file);
+    const uploadFiles = await Promise.all(
+      files.map(async (file, index) => {
+        const { v4: uuidv4 } = require("uuid");
+        const newFileName = uuidv4();
+
+        const fileToStorage = file;
+        console.log(fileToStorage);
+
+        // Upload the file to Supabase Storage
+        const { error } = await supabase.storage
+          .from("home_photos")
+          .upload("public/" + newFileName, fileToStorage, {
+            contentType: fileToStorage.type, // Adjust based on the file type
+            cacheControl: "36000",
+          });
+
+        if (error) {
+          console.log(
+            "Error while uploading photo " +
+              fileToStorage.name +
+              ": " +
+              error.message
+          );
+        }
+
+        const fileUrl =
+          "https://dxtymkfjqltlvlpxcmia.supabase.co/storage/v1/object/public/home_photos/public/" +
+          newFileName;
+
+        data.coverPhoto =
+          data.coverPhoto === paths[index] ? fileUrl : data.coverPhoto;
+        data.sleepingSpacePhotos = data.sleepingSpacePhotos.map((photo) =>
+          photo === paths[index] ? fileUrl : photo
+        );
+        data.livingSpacePhotos = data.livingSpacePhotos.map((photo) =>
+          photo === paths[index] ? fileUrl : photo
+        );
+        data.bathroomPhotos = data.bathroomPhotos.map((photo) =>
+          photo === paths[index] ? fileUrl : photo
+        );
+        data.kitchenPhotos = data.kitchenPhotos.map((photo) =>
+          photo === paths[index] ? fileUrl : photo
+        );
+        data.buildingPhotos = data.buildingPhotos.map((photo) =>
+          photo === paths[index] ? fileUrl : photo
+        );
+        data.outdoorsPhotos = data.outdoorsPhotos.map((photo) =>
+          photo === paths[index] ? fileUrl : photo
+        );
+        data.additionalPhotos = data.additionalPhotos.map((photo) =>
+          photo === paths[index] ? fileUrl : photo
+        );
       })
     );
 
@@ -205,8 +283,6 @@ export default function PhotosForm(form: formProps) {
         outdoors: data.outdoorsPhotos,
         additional:
           data.additionalPhotos != undefined ? data.additionalPhotos : [],
-        newPhotosFiles: formData,
-        newPhotosPaths: paths,
         photosToDelete: photosToDelete,
       });
     } else {
@@ -222,8 +298,6 @@ export default function PhotosForm(form: formProps) {
         outdoors: data.outdoorsPhotos,
         additional:
           data.additionalPhotos != undefined ? data.additionalPhotos : [],
-        newPhotosFiles: formData,
-        newPhotosPaths: paths,
         photosToDelete: photosToDelete,
       });
     }
@@ -367,21 +441,34 @@ export default function PhotosForm(form: formProps) {
                         );
                       }
                     );
+                    const handleCompress = async () => {
+                      const compressedFiles = await compressFiles(
+                        acceptedFiles as File[]
+                      );
 
-                    console.log(watch(category.validationString));
-                    const filePaths = acceptedFiles.map((file) =>
-                      URL.createObjectURL(file)
-                    );
-                    watch(category.validationString) != undefined
-                      ? setValue(category.validationString, [
-                          ...(watch(category.validationString) as string[]),
-                          ...filePaths,
-                        ])
-                      : setValue(category.validationString, [...filePaths]);
+                      console.log(watch(category.validationString));
+                      const filePaths = compressedFiles.map((file) =>
+                        URL.createObjectURL(file)
+                      );
+                      watch(category.validationString) != undefined
+                        ? setValue(category.validationString, [
+                            ...(watch(category.validationString) as string[]),
+                            ...filePaths,
+                          ])
+                        : setValue(category.validationString, [...filePaths]);
 
-                    const newFiles = [...newPhotos.files, ...acceptedFiles];
-                    const newPaths = [...newPhotos.paths, ...filePaths];
-                    setNewPhotos({ files: newFiles, paths: newPaths });
+                      const newFiles = [...newPhotos.files, ...compressedFiles];
+                      const newPaths = [...newPhotos.paths, ...filePaths];
+                      setNewPhotos({ files: newFiles, paths: newPaths });
+                    };
+
+                    if (acceptedFiles.length > 0) {
+                      handleCompress();
+                    } else {
+                      alert(
+                        "Image format not supported. Select JPG, PNG or WEBP images."
+                      );
+                    }
                   }
                 }}
               />

@@ -7,8 +7,20 @@ import SparksIcon from "../icons/sparks.svg";
 import LeafIcon from "../icons/leaf.svg";
 import BrandIcon from "../icons/brand.svg";
 import HomeIcon from "../icons/home-management.svg";
+import { cookies } from "next/headers";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { redirect } from "next/navigation";
 
-export default function Homes() {
+export default async function Homes() {
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore });
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (session) {
+    redirect("/hosting");
+  }
   return (
     <div className="min-h-full flex flex-col">
       <div className="sticky z-40 bg-white top-0 flex flex-row justify-between p-5">
@@ -26,9 +38,11 @@ export default function Homes() {
             Homes
           </p>
         </div>
-        <Link href={"/login"}>
-          <Button>Log in</Button>
-        </Link>
+        {!session && (
+          <Link href={"/login"}>
+            <Button>Log in</Button>
+          </Link>
+        )}
       </div>
       <div className="flex-grow">
         <div className="relative">
@@ -41,7 +55,7 @@ export default function Homes() {
             loading="eager"
             className="w-full aspect-[9/10] sm:aspect-[5/4] md:aspect-[6/3] lg:aspect-[5/2] object-cover"
           />
-          <div className="absolute w-3/4 sm:w-2/3 lg:w-1/2 h-fit flex flex-col m-auto sm:m-8 sm:my-auto left-0 right-0 top-0 bottom-0 space-y-2 p-7 sm:p-8 md:p-9 lg:p-10 backdrop-blur-lg bg-white/30 rounded-3xl">
+          <div className="absolute w-3/4 sm:w-2/3 lg:w-1/2 h-fit flex flex-col m-auto sm:m-8 sm:my-auto left-0 right-0 top-0 bottom-0 space-y-2 p-7 sm:p-8 md:p-9 lg:p-10 backdrop-blur-md bg-white/40 rounded-3xl">
             <p className="font-extrabold text-2xl sm:text-4xl md:text-5xl">
               Premium, top-tier accommodations tailored for long-term residency.
             </p>
