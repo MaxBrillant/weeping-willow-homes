@@ -6,7 +6,6 @@ import { redirect } from "next/navigation";
 import { getUserBasicInfo } from "@/api/fetch/fetchUserProfile";
 import SignOutButton from "../components/signOutButton";
 import UserHasProfile from "@/api/fetch/checkIfUserHasProfile";
-import { Separator } from "@/components/ui/separator";
 import { IoIosArrowForward } from "react-icons/io";
 
 export default async function Account() {

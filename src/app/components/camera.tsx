@@ -7,6 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import Compressor from "compressorjs";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { IoMdCamera } from "react-icons/io";
@@ -54,6 +55,22 @@ const SelfieCamera = (props: {
     }
   }, [mediaStream]);
 
+  function compressImage(file: File): Promise<File> {
+    return new Promise((resolve, reject) => {
+      new Compressor(file, {
+        quality: 0.6, // Adjust the desired image quality (0.0 - 1.0)
+        // maxWidth: 700, // Adjust the maximum width of the compressed image
+        // maxHeight: 700, // Adjust the maximum height of the compressed image
+        success: (result) => {
+          resolve(new File([result], file.name, { type: result.type }));
+        },
+        error: (error) => {
+          reject(error);
+        },
+      });
+    });
+  }
+
   const capturePhoto = () => {
     if (videoRef.current) {
       const canvas = document.createElement("canvas");
@@ -62,11 +79,13 @@ const SelfieCamera = (props: {
       const ctx = canvas.getContext("2d");
       if (ctx) {
         ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-
         canvas.toBlob(async (blob) => {
           if (blob) {
-            props.setProfilePhoto(blob);
-            setProfilePhoto(blob);
+            const file = new File([blob], "profilePhoto", { type: blob.type });
+            await compressImage(file).then((value) => {
+              props.setProfilePhoto(value);
+              setProfilePhoto(value);
+            });
           }
         });
       }

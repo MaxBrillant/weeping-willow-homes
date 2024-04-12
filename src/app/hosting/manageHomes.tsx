@@ -1,39 +1,14 @@
-import UserHasProfile from "@/api/fetch/checkIfUserHasProfile";
 import getAllHostHomes from "@/api/fetch/fetchHostHomes";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies, headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { TbHomeOff } from "react-icons/tb";
 import { BsHourglassSplit } from "react-icons/bs";
 import { MdAddHome } from "react-icons/md";
 
 export default async function ManageHomes() {
-  const cookieStore = cookies();
-  const supabase = createServerComponentClient({ cookies: () => cookieStore });
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  const headersList = headers();
-  if (!session) {
-    redirect(`/login?redirect-to=${headersList.get("x-pathname")}`);
-  } else {
-    const userHasProfile = await UserHasProfile();
-    if (!userHasProfile) {
-      redirect(
-        `/users/create-profile?redirect-to=${headersList
-          .get("x-pathname")
-          ?.replaceAll("&", "!")}`
-      );
-    }
-  }
-
   const hostHomes = await getAllHostHomes();
-  console.log(hostHomes);
 
   if (hostHomes.length === 0) {
     return (

@@ -321,7 +321,7 @@ export default function PhotosForm(form: formProps) {
           <div key={index} className="flex flex-col gap-3">
             <p className="font-bold text-lg">{category.title}</p>
             <p className="font-normal text-sm">{category.description}</p>
-            <div className="grid grid-cols-4 gap-2 items-center">
+            <div className="grid grid-cols-3 gap-2 items-center">
               {watch(category.validationString)?.map((photo, index) => {
                 return (
                   <div key={index} id={String(index)} className="relative">
@@ -331,7 +331,7 @@ export default function PhotosForm(form: formProps) {
                       width={100}
                       alt="photo"
                       loading="lazy"
-                      className="aspect-square object-cover rounded-xl"
+                      className="w-full aspect-[4/3] object-cover rounded-xl"
                     />
                     <DropdownMenu>
                       <DropdownMenuTrigger className="absolute top-1 right-1 ">

@@ -27,7 +27,7 @@ export default function EditPopup(content: {
       <DialogTrigger asChild>
         <Button variant={"outline"}>Edit</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] max-h-[500px] overflow-auto">
+      <DialogContent className="w-full h-full sm:max-w-[500px] sm:max-h-[500px] overflow-auto">
         <DialogHeader>
           <DialogTitle>{content.title}</DialogTitle>
         </DialogHeader>
