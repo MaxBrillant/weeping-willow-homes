@@ -79,48 +79,44 @@ export default async function Homes() {
             <CityShowcase />
           </div>
         </div>
-        <div className=" flex flex-col w-full bg-cover bg-[url('/willow-2.png')]">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-10 backdrop-blur-md bg-white/0">
-            <div className="flex flex-col space-y-2 p-7 backdrop-blur-lg bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
-              <SparksIcon className="w-20 h-20 object-cover" />
-              <p className="font-extrabold text-2xl">Luxury Living</p>
-              <p className="font-medium">
-                Our elegantly furnished homes seamlessly blend comfort and
-                style, offering a refined living experience.
-              </p>
-            </div>
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-5 p-10 bg-cover bg-[url('/willow-2.png')]">
+          <div className="flex flex-col space-y-2 p-7 backdrop-blur-md bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
+            <SparksIcon className="w-20 h-20 object-cover" />
+            <p className="font-extrabold text-2xl">Luxury Living</p>
+            <p className="font-medium">
+              Our elegantly furnished homes seamlessly blend comfort and style,
+              offering a refined living experience.
+            </p>
+          </div>
 
-            <div className="flex flex-col space-y-2 p-7 backdrop-blur-lg bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
-              <LeafIcon className="w-20 h-20" />
-              <p className="font-extrabold text-2xl">
-                Environmental Engagement
-              </p>
-              <p className="font-medium">
-                Each guest is presented with a Weeping Willow tree to plant and
-                nurture during their stay, fostering the creation of a lasting
-                legacy.
-              </p>
-            </div>
+          <div className="flex flex-col space-y-2 p-7 backdrop-blur-md bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
+            <LeafIcon className="w-20 h-20" />
+            <p className="font-extrabold text-2xl">Environmental Engagement</p>
+            <p className="font-medium">
+              Each guest is presented with a Weeping Willow tree to plant and
+              nurture during their stay, fostering the creation of a lasting
+              legacy.
+            </p>
+          </div>
 
-            <div className="flex flex-col space-y-2 p-7 backdrop-blur-lg bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
-              <BrandIcon className="w-20 h-20" />
-              <p className="font-extrabold text-2xl">
-                Exclusive Brand Merchandise
-              </p>
-              <p className="font-medium">
-                Premium items available only to our guests, partners, and hosts
-                encapsulate the essence of Willow Homes.
-              </p>
-            </div>
+          <div className="flex flex-col space-y-2 p-7 backdrop-blur-md bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
+            <BrandIcon className="w-20 h-20" />
+            <p className="font-extrabold text-2xl">
+              Exclusive Brand Merchandise
+            </p>
+            <p className="font-medium">
+              Premium items available only to our guests, partners, and hosts
+              encapsulate the essence of Willow Homes.
+            </p>
+          </div>
 
-            <div className="flex flex-col space-y-2 p-7 backdrop-blur-lg bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
-              <HomeIcon className="w-20 h-20" />
-              <p className="font-extrabold text-2xl">Personalized Service</p>
-              <p className="font-medium">
-                Exceptional home management and private compounds care services
-                ensure an unforgettable stay.
-              </p>
-            </div>
+          <div className="flex flex-col space-y-2 p-7 backdrop-blur-md bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
+            <HomeIcon className="w-20 h-20" />
+            <p className="font-extrabold text-2xl">Personalized Service</p>
+            <p className="font-medium">
+              Exceptional home management and private compounds care services
+              ensure an unforgettable stay.
+            </p>
           </div>
         </div>
 

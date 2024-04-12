@@ -328,6 +328,11 @@ export default function LocationForm(form: formProps) {
       {isMapVisible && (
         <div className="flex flex-col gap-3 p-5 bg-slate-200 rounded-2xl">
           <p className="font-bold text-lg">Location on the map</p>
+          {isAdjustingMap && (
+            <p className="font-medium text-center bg-yellow-100 border border-yellow-600 p-3 rounded-2xl">
+              Hold and drag to adjust to your desired location
+            </p>
+          )}
           {isAdjustingMap ? (
             <div className="relative">
               <div className="flex flex-col w-full aspect-[4/3]">

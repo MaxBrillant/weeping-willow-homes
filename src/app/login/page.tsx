@@ -1,8 +1,7 @@
 "use client";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import SignInButton from "../components/signInButton";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -10,9 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export default function Login({ searchParams }: { searchParams: any }) {
-  const { push } = useRouter();
   const [email, setEmail] = useState<string>("");
   const [open, setOpen] = useState(false);
+
+  const supabase = createClientComponentClient();
 
   const params =
     searchParams instanceof URLSearchParams
@@ -26,21 +26,6 @@ export default function Login({ searchParams }: { searchParams: any }) {
   } else {
     url = `${location.origin}/auth/callback`;
   }
-
-  const supabase = createClientComponentClient();
-  const handleSignedOutUser = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (session) {
-      push("/");
-    }
-  };
-
-  useEffect(() => {
-    handleSignedOutUser();
-  }, []);
 
   return (
     <div className="w-screen h-screen grid place-items-center p-10">
@@ -73,9 +58,7 @@ export default function Login({ searchParams }: { searchParams: any }) {
                 .signInWithOtp({
                   email: email,
                   options: {
-                    emailRedirectTo: redirectUrl
-                      ? redirectUrl
-                      : `${location.origin}`,
+                    emailRedirectTo: url,
                   },
                 })
                 .then(
@@ -101,22 +84,21 @@ export default function Login({ searchParams }: { searchParams: any }) {
         <DialogContent className="w-full h-full overflow-auto">
           <div className="flex flex-col gap-5 p-5 items-center justify-center">
             <p className="text-xl font-semibold text-center">
-              We have sent a verification link to <h1>{email}</h1>, kindly
-              check your mailbox
+              We have sent a verification link to{" "}
+              <p className="text-2xl font-bold">{email}</p> kindly check your
+              mailbox
             </p>
             <p className="font-medium">
               {`You have not received any verification email?`}
             </p>
             <Button
-              variant={"link"}
+              variant={"outline"}
               onClick={async () => {
                 await supabase.auth
                   .signInWithOtp({
                     email: email,
                     options: {
-                      emailRedirectTo: redirectUrl
-                        ? redirectUrl
-                        : `${location.origin}/hosting`,
+                      emailRedirectTo: url,
                     },
                   })
                   .then(
@@ -127,6 +109,9 @@ export default function Login({ searchParams }: { searchParams: any }) {
             >
               Send again
             </Button>
+            <p>
+              {`If you still haven't received anything, check in your spam emails.`}
+            </p>
           </div>
         </DialogContent>
       </Dialog>
