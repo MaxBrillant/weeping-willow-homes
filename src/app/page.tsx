@@ -48,7 +48,7 @@ export default async function Homes() {
         <div className="relative">
           <Image
             src="/willow-1.png"
-            alt="logo"
+            alt="willow"
             width={1000}
             height={1000}
             priority
@@ -79,8 +79,17 @@ export default async function Homes() {
             <CityShowcase />
           </div>
         </div>
-        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-5 p-10 bg-cover bg-[url('/willow-2.png')]">
-          <div className="flex flex-col space-y-2 p-7 backdrop-blur-md bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
+        <div className="relative grid grid-cols-1 md:grid-cols-2 gap-5 p-10 w-full">
+          <Image
+            src="/willow-2.png"
+            alt="willow"
+            width={1000}
+            height={1000}
+            loading="eager"
+            className="absolute top-0 bottom-0 left-0 right-0 w-full h-full object-cover"
+          />
+          <div className="absolute top-0 bottom-0 left-0 right-0 w-full h-full backdrop-blur-md bg-white/0"></div>
+          <div className="flex flex-col space-y-2 p-7 backdrop-blur-lg bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
             <SparksIcon className="w-20 h-20 object-cover" />
             <p className="font-extrabold text-2xl">Luxury Living</p>
             <p className="font-medium">
@@ -89,7 +98,7 @@ export default async function Homes() {
             </p>
           </div>
 
-          <div className="flex flex-col space-y-2 p-7 backdrop-blur-md bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
+          <div className="flex flex-col space-y-2 p-7 backdrop-blur-lg bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
             <LeafIcon className="w-20 h-20" />
             <p className="font-extrabold text-2xl">Environmental Engagement</p>
             <p className="font-medium">
@@ -99,7 +108,7 @@ export default async function Homes() {
             </p>
           </div>
 
-          <div className="flex flex-col space-y-2 p-7 backdrop-blur-md bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
+          <div className="flex flex-col space-y-2 p-7 backdrop-blur-lg bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
             <BrandIcon className="w-20 h-20" />
             <p className="font-extrabold text-2xl">
               Exclusive Brand Merchandise
@@ -110,7 +119,7 @@ export default async function Homes() {
             </p>
           </div>
 
-          <div className="flex flex-col space-y-2 p-7 backdrop-blur-md bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
+          <div className="flex flex-col space-y-2 p-7 backdrop-blur-lg bg-black/30 text-white fill-white rounded-3xl drop-shadow-lg">
             <HomeIcon className="w-20 h-20" />
             <p className="font-extrabold text-2xl">Personalized Service</p>
             <p className="font-medium">
