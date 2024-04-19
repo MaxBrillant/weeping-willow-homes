@@ -15,6 +15,7 @@ import { IoMdPhotos } from "react-icons/io";
 import { HiSparkles } from "react-icons/hi2";
 import { MdOutlineRule } from "react-icons/md";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function BecomeAHost() {
   const { push } = useRouter();
@@ -48,11 +49,11 @@ export default function BecomeAHost() {
   }, [open]);
 
   useEffect(() => {
-    const checkProfile = async()=>{
+    const checkProfile = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-  
+
       if (session) {
         const userHasProfile = await UserHasProfile();
         if (!userHasProfile) {
@@ -61,10 +62,10 @@ export default function BecomeAHost() {
               .toString()
               .replaceAll("&", "!")}`
           );
-            }}
-  
-          }
-          checkProfile();
+        }
+      }
+    };
+    checkProfile();
   }, []);
   return (
     <div className="min-h-screen flex flex-col">
@@ -103,7 +104,7 @@ export default function BecomeAHost() {
               {`Here is a quick guide on how to setup your home`}
             </p>
             <p className="font-medium text-md">
-              {`You have to go through 7 steps and provide various information about your home in order to complete the setup. You can always quit and come back later, your changes will be saved as long as you have clicked on the "Save and exit" button.`}
+              {`You have to go through 7 steps and provide various information about your home in order to complete the setup. If you don't have time to go through everything, you can just go to the Quick Setup Form`}
             </p>
             <div className="relative flex flex-col">
               <p className="absolute right-5 font-black top-20 text-5xl opacity-15">
@@ -176,7 +177,16 @@ export default function BecomeAHost() {
                 <p className="font-medium">House rules and information</p>
               </div>
             </div>
-            <Button onClick={() => setOpen(false)}>Start the setup</Button>
+            <div className="flex flex-col">
+              <Button onClick={() => setOpen(false)} size={"lg"}>
+                Start the setup
+              </Button>
+              <Link href={"https://forms.gle/dJzHqcoGN8tCeoYw6"}>
+                <Button variant={"ghost"} className="w-full">
+                  Go to the Quick Setup Form
+                </Button>
+              </Link>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
